@@ -589,18 +589,29 @@ let plVoice = null; const canSpeak = 'speechSynthesis' in window;
 function pickVoice() {
   try {
     const vs = speechSynthesis.getVoices().filter(v => /^pl/i.test(v.lang));
-    const rank = v => /natural/i.test(v.name) ? 0 : /online|neural/i.test(v.name) ? 1 : /premium|enhanced/i.test(v.name) ? 2 : /google/i.test(v.name) ? 3 : 4;
+    /* iPhone names every quality level just "Zosia"; the quality is only in voiceURI (…premium… / …enhanced… / …compact…) */
+    const rank = v => { const s = v.name + ' ' + (v.voiceURI || ''); return /natural/i.test(s) ? 0 : /premium/i.test(s) ? 1 : /enhanced/i.test(s) ? 2 : /online|neural/i.test(s) ? 3 : /google/i.test(s) ? 4 : /compact/i.test(s) ? 6 : 5; };
     plVoice = vs.sort((a, b) => rank(a) - rank(b))[0] || null;
   } catch {}
 }
 if (canSpeak) { pickVoice(); try { speechSynthesis.onvoiceschanged = pickVoice; } catch {} }
+const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let utter = null, sayT = null; /* keep a reference so the browser can't drop the utterance mid-word */
 function say(text) {
   if (!canSpeak) return;
   try {
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text.replace(/\//g, ', ').replace(/\.{2,}|…/g, ' '));
-    u.lang = 'pl-PL'; if (plVoice) u.voice = plVoice; u.rate = .9;
-    speechSynthesis.speak(u);
+    if (!plVoice) pickVoice();
+    clearTimeout(sayT);
+    const busy = speechSynthesis.speaking || speechSynthesis.pending;
+    if (busy) speechSynthesis.cancel();
+    const go = () => {
+      utter = new SpeechSynthesisUtterance(text.replace(/\//g, ', ').replace(/\.{2,}|…/g, ' '));
+      utter.lang = 'pl-PL'; if (plVoice) utter.voice = plVoice;
+      utter.rate = IOS ? 1 : .9; /* iPhone voices stutter at non-default speeds */
+      speechSynthesis.speak(utter);
+    };
+    /* iPhone garbles speech that starts in the same instant as a cancel, so leave a short gap */
+    if (busy) sayT = setTimeout(go, IOS ? 120 : 30); else go();
     if (!plVoice) toast('No Polish voice found. Add one in your device’s speech settings.');
   } catch {}
 }

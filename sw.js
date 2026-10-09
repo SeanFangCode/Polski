@@ -1,6 +1,6 @@
 // Offline support: the app shell is cached on first visit.
 // Pages load from the network when online (so updates arrive) and from the cache when offline.
-const CACHE = 'polski-v1';
+const CACHE = 'polski-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './apple-touch-icon.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
