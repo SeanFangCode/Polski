@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Polski">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f6f5f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14171f" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,sans-serif;-webkit-text-size-adjust:100%}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Mów po polsku</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: a worksheet-style study app. Header band with a paper-cut rosette, then group shelves of topic rows; a topic opens into a focused study surface with mode tabs. */
+:root{
+  --paper:#f6f5f2; --sheet:#ffffff; --ink:#1d2333; --ink-2:#555c6e; --rule:#e2e0da;
+  --red:#c8102e; --red-ink:#ffffff; --red-soft:#fbe7ea; --green:#2f7a4f; --green-soft:#e3f1e8;
+  --amber:#a66300; --amber-soft:#fbefd9; --flag-white:#ffffff; --cut-1:#c8102e; --cut-2:#2f7a4f; --cut-3:#1d2333;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --r:10px; --shadow:0 1px 2px rgb(29 35 51 / .06), 0 4px 16px rgb(29 35 51 / .06);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#14171f; --sheet:#1c2029; --ink:#eceae4; --ink-2:#a3a8b5; --rule:#2c313d;
+  --red:#ef4a5f; --red-ink:#1a0006; --red-soft:#3a1a21; --green:#5cbf86; --green-soft:#18301f;
+  --amber:#e7a94a; --amber-soft:#35290f; --flag-white:#f2efe8; --cut-1:#ef4a5f; --cut-2:#5cbf86; --cut-3:#eceae4;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 4px 16px rgb(0 0 0 / .25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#14171f; --sheet:#1c2029; --ink:#eceae4; --ink-2:#a3a8b5; --rule:#2c313d;
+  --red:#ef4a5f; --red-ink:#1a0006; --red-soft:#3a1a21; --green:#5cbf86; --green-soft:#18301f;
+  --amber:#e7a94a; --amber-soft:#35290f; --flag-white:#f2efe8; --cut-1:#ef4a5f; --cut-2:#5cbf86; --cut-3:#eceae4;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 4px 16px rgb(0 0 0 / .25); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:980px;margin:0 auto}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.1}
+.pl{font-family:var(--f-display);font-weight:700}
+.muted{color:var(--ink-2)}
+.label{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--ink-2)}
+.num{font-variant-numeric:tabular-nums}
+
+/* header */
+.top{display:flex;align-items:center;gap:16px;padding-block:24px 20px;border-bottom:2px solid var(--ink);margin-bottom:24px;flex-wrap:wrap}
+.rosette{width:64px;height:64px;flex:none}
+.brand{flex:1;min-width:200px}
+.brand h1{font-size:clamp(1.9rem,5vw,2.8rem);font-weight:800;letter-spacing:-.02em}
+.brand h1 span{color:var(--red)}
+.brand p{margin:4px 0 0;color:var(--ink-2)}
+.stats{display:flex;gap:20px}
+.stat b{display:block;font-family:var(--f-display);font-size:1.6rem;line-height:1}
+.stat span{font-size:.8rem;color:var(--ink-2)}
+
+/* home */
+.continue{display:flex;gap:12px;align-items:center;justify-content:space-between;background:var(--ink);color:var(--paper);padding:16px 20px;border-radius:var(--r);margin-bottom:28px;flex-wrap:wrap}
+.continue .label{color:inherit;opacity:.7}
+.continue h3{font-size:1.3rem}
+.btn{border:1.5px solid var(--ink);background:var(--sheet);border-radius:999px;padding:8px 16px;font-weight:700;display:inline-flex;align-items:center;gap:8px}
+.btn.primary{background:var(--red);border-color:var(--red);color:var(--red-ink)}
+.btn.ghost{background:transparent}
+.continue .btn{border-color:var(--paper);background:var(--paper);color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:default}
+.group{margin-bottom:36px}
+.ghead{display:flex;align-items:end;gap:12px;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
+.ghead h2{font-size:1.5rem;font-weight:800}
+.ghead .gpl{font-family:var(--f-display);color:var(--red);font-weight:700;font-size:.95rem;display:block;margin-bottom:2px}
+.ghead-r{display:flex;align-items:center;gap:12px}
+.bar{height:6px;background:var(--rule);border-radius:3px;overflow:hidden;width:100px}
+.bar i{display:block;height:100%;background:var(--green);border-radius:3px}
+.topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.tcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;text-align:left;display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;transition:border-color .15s, transform .15s}
+.tcard:hover{border-color:var(--ink);transform:translateY(-1px)}
+.tcard h3{font-size:1.05rem;font-weight:700}
+.tcard .meta{font-size:.82rem;color:var(--ink-2);grid-column:1}
+.ring{grid-row:1/3;grid-column:2;width:40px;height:40px}
+.ring circle{fill:none;stroke-width:4}
+.ring .bg{stroke:var(--rule)} .ring .fg{stroke:var(--green);stroke-linecap:round;transform:rotate(-90deg);transform-origin:center}
+.ring text{font-size:11px;font-weight:700;fill:var(--ink);font-family:var(--f-body)}
+
+/* topic view */
+.back{background:none;border:0;padding:4px 0;color:var(--ink-2);font-weight:700;display:inline-flex;gap:6px;align-items:center;margin-bottom:8px}
+.back:hover{color:var(--ink)}
+.thead{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.thead h2{font-size:clamp(1.7rem,4vw,2.3rem);font-weight:800}
+.thead .eps{margin-top:6px}
+.tabs{display:flex;gap:4px;border-bottom:1.5px solid var(--rule);margin-bottom:20px;overflow-x:auto}
+.tab{background:none;border:0;padding:10px 14px;font-weight:700;color:var(--ink-2);border-bottom:3px solid transparent;margin-bottom:-1.5px;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--red)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden}
+.seg button{background:none;border:0;padding:6px 14px;font-weight:700;font-size:.9rem}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.spacer{flex:1}
+
+/* worksheet */
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.srow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) auto auto;gap:12px;align-items:center;padding:10px 16px;border-top:1px solid var(--rule)}
+.srow.h{border-top:0;padding-block:12px 8px}
+.srow .en{min-width:0}
+.srow .plw{min-width:0;font-size:1.1rem}
+.srow.known .plw{color:var(--green)}
+.know{width:26px;height:26px;border:2px solid var(--ink-2);border-radius:6px;background:none;display:grid;place-items:center;padding:0}
+.know[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:var(--sheet)}
+.speak{background:none;border:0;padding:4px;color:var(--ink-2);display:grid;place-items:center;border-radius:6px}
+.speak:hover{color:var(--red)}
+.speak[hidden]{display:none}
+@media (max-width:560px){.srow{grid-template-columns:minmax(0,1fr) auto auto;}.srow .en{grid-column:1;font-size:.9rem;color:var(--ink-2)}.srow .plw{grid-column:1;grid-row:2}.srow .speak{grid-row:1/3;grid-column:2}.srow .know{grid-row:1/3;grid-column:3}.srow.h{display:none}}
+.subhead{padding:14px 16px 6px;border-top:1px solid var(--rule)}
+
+/* study surface */
+.stage{max-width:620px;margin:0 auto}
+.count{display:flex;justify-content:space-between;font-size:.9rem;color:var(--ink-2);margin-bottom:8px}
+.card{position:relative;min-height:260px;background:var(--sheet);border:1px solid var(--rule);border-radius:16px;box-shadow:var(--shadow);display:grid;place-items:center;text-align:center;padding:32px 24px;cursor:pointer;width:100%}
+.card .side{display:flex;flex-direction:column;gap:12px;align-items:center}
+.card .big{font-family:var(--f-display);font-weight:700;font-size:clamp(1.5rem,5vw,2.3rem);line-height:1.15;overflow-wrap:anywhere}
+.card .ans{font-family:var(--f-display);font-weight:700;font-size:clamp(1.3rem,4vw,1.9rem);color:var(--red);overflow-wrap:anywhere}
+.card .hint{font-size:.85rem;color:var(--ink-2)}
+.card .speak{position:absolute;top:12px;right:12px}
+.card.flip{animation:flip .28s ease}
+@keyframes flip{0%{transform:rotateX(0)}50%{transform:rotateX(80deg)}100%{transform:rotateX(0)}}
+.actions{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.btn.again{border-color:var(--amber);color:var(--amber)}
+.btn.got{background:var(--green);border-color:var(--green);color:var(--sheet)}
+.opts{display:grid;gap:10px;margin-top:16px}
+.opt{text-align:left;background:var(--sheet);border:1.5px solid var(--rule);border-radius:var(--r);padding:12px 16px;font-size:1.05rem;display:flex;gap:12px;align-items:center}
+.opt kbd{font-family:var(--f-body);font-size:.75rem;border:1px solid var(--rule);border-radius:4px;padding:1px 6px;color:var(--ink-2)}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.right{border-color:var(--green);background:var(--green-soft)}
+.opt.wrong{border-color:var(--red);background:var(--red-soft)}
+.opt:disabled{cursor:default}
+.prompt{background:var(--sheet);border:1px solid var(--rule);border-radius:16px;padding:28px 24px;text-align:center;box-shadow:var(--shadow);position:relative}
+.prompt .big{font-family:var(--f-display);font-weight:700;font-size:clamp(1.4rem,4.5vw,2.1rem);line-height:1.2;overflow-wrap:anywhere}
+.prompt .speak{position:absolute;top:10px;right:10px}
+.typein{display:flex;gap:8px;margin-top:16px}
+.typein input{flex:1;min-width:0;font:inherit;font-size:1.2rem;font-family:var(--f-display);padding:12px 14px;border:2px solid var(--ink);border-radius:var(--r);background:var(--sheet);color:var(--ink)}
+.typein input.ok{border-color:var(--green)} .typein input.bad{border-color:var(--red)}
+.keys{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center}
+.keys button{width:40px;height:40px;border:1px solid var(--rule);background:var(--sheet);border-radius:8px;font-family:var(--f-display);font-weight:700;font-size:1.1rem}
+.keys button:hover{border-color:var(--ink)}
+.fb{margin-top:14px;padding:12px 16px;border-radius:var(--r);font-weight:700}
+.fb.ok{background:var(--green-soft);color:var(--green)}
+.fb.near{background:var(--amber-soft);color:var(--amber)}
+.fb.bad{background:var(--red-soft);color:var(--red)}
+.fb .pl{font-size:1.15rem}
+.done{text-align:center;padding:32px 16px}
+.done .score{font-family:var(--f-display);font-size:4rem;font-weight:800;line-height:1;color:var(--red)}
+.empty{padding:24px;text-align:center;color:var(--ink-2)}
+
+/* alphabet + verbs */
+.alpha{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.letter{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px 14px;text-align:left;display:grid;gap:2px}
+.letter:hover{border-color:var(--ink)}
+.letter .L{font-family:var(--f-display);font-weight:800;font-size:2rem;line-height:1}
+.letter .L.special{color:var(--red)}
+.letter .s{font-size:.85rem;color:var(--ink-2)}
+.letter .ex{font-family:var(--f-display);font-weight:700}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.vtab{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+.vtab h3{padding:12px 16px;font-size:1.15rem;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;align-items:baseline}
+.vtab h3 small{font-family:var(--f-body);font-weight:400;color:var(--ink-2);font-size:.85rem}
+.vtab table{width:100%;border-collapse:collapse}
+.vtab td{padding:6px 16px;border-top:1px solid var(--rule)}
+.vtab tr:first-child td{border-top:0}
+.vtab td.f{font-family:var(--f-display);font-weight:700;color:var(--red)}
+.note{background:var(--sheet);border-left:4px solid var(--red);padding:12px 16px;border-radius:0 var(--r) var(--r) 0;margin-bottom:20px;max-width:70ch}
+/* grammar */
+mark.end{background:var(--red-soft);color:var(--red);border-radius:3px;padding:0 1px;font-weight:800}
+.lesson{max-width:760px}
+.lesson .lead{font-size:1.1rem;max-width:65ch;margin:0 0 24px}
+.lesson section{margin-bottom:28px}
+.lesson h3{font-size:1.25rem;margin-bottom:10px}
+.lesson p{max-width:65ch;margin:0}
+.tablewrap{overflow-x:auto;background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r)}
+.gtable{width:100%;border-collapse:collapse;font-size:.95rem}
+.gtable th{text-align:left;padding:10px 14px;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);border-bottom:1.5px solid var(--rule);white-space:nowrap}
+.gtable td{padding:9px 14px;border-top:1px solid var(--rule);vertical-align:top}
+.gtable tr:first-child td{border-top:0}
+.gtable td:first-child{font-weight:700}
+.exlist{display:grid;gap:8px}
+.ex{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:center;background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:10px 14px}
+.ex .pl{font-size:1.1rem}
+.ex .muted{grid-column:1;font-size:.9rem}
+.ex .speak{grid-row:1/3;grid-column:2}
+.gap{display:inline-block;min-width:3.2em;border-bottom:3px solid var(--red);margin:0 4px}
+.gloss{margin-top:8px;color:var(--ink-2)}
+.why{font-weight:400;color:var(--ink);margin-top:6px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-weight:700;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <svg class="rosette" viewBox="0 0 64 64" aria-hidden="true">
+      <defs>
+        <path id="bub" d="M10 4h44a8 8 0 0 1 8 8v30a8 8 0 0 1-8 8H26l-12 10v-10h-4a8 8 0 0 1-8-8V12a8 8 0 0 1 8-8z"/>
+        <clipPath id="cTop"><rect x="0" y="0" width="64" height="27"/></clipPath>
+        <clipPath id="cBot"><rect x="0" y="27" width="64" height="40"/></clipPath>
+      </defs>
+      <use href="#bub" fill="var(--flag-white)"/>
+      <use href="#bub" fill="var(--red)" clip-path="url(#cBot)"/>
+      <use href="#bub" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>
+      <text x="32" y="38" text-anchor="middle" font-family="Bricolage Grotesque, system-ui, sans-serif" font-weight="800" font-size="34" fill="var(--red)" clip-path="url(#cTop)">ą</text>
+      <text x="32" y="38" text-anchor="middle" font-family="Bricolage Grotesque, system-ui, sans-serif" font-weight="800" font-size="34" fill="var(--flag-white)" clip-path="url(#cBot)">ą</text>
+    </svg>
+    <div class="brand">
+      <h1>Mów po <span>polsku</span></h1>
+      <p id="sub">Words and phrases from your Talk Polish episodes</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><b class="num" id="sKnown">0</b><span>marked known</span></div>
+      <div class="stat"><b class="num" id="sStreak">0</b><span>day streak</span></div>
+    </div>
+  </header>
+  <main id="app"></main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const GROUPS = [{"id":"basics","name":"Foundations","pl":"Podstawy","topics":[{"id":"alphabet","title":"Alphabet","eps":[1],"words":[],"phrases":[],"kind":"alphabet"},{"id":"greetings","title":"Greetings & Introductions","eps":[2],"words":[["good morning","dzień dobry"],["good night","dobranoc"],["good evening","dobry wieczór"],["good bye","do widzenia"],["hi","cześć"],["till tomorrow","do jutra"],["see you soon","do zobaczenia"],["see you","na razie"],["bye","pa"],["very nice to meet you","bardzo mi miło"],["nice to meet you","miło mi"],["me too","mnie również"],["yes","tak"],["no","nie"],["please","proszę"],["here you go","proszę"],["you're welcome","proszę"],["thank you","dziękuję"],["you're welcome","nie ma za co"],["I'm sorry","przepraszam"],["I understand","rozumiem"],["I don't understand","nie rozumiem"],["I know","wiem"],["I don't know","nie wiem"],["please repeat","proszę powtórzyć"]],"phrases":[]},{"id":"numbers","title":"Numbers","eps":[3],"words":[["1","jeden"],["2","dwa"],["3","trzy"],["4","cztery"],["5","pięć"],["6","sześć"],["7","siedem"],["8","osiem"],["9","dziewięć"],["10","dziesięć"],["11","jedenaście"],["12","dwanaście"],["13","trzynaście"],["14","czternaście"],["15","piętnaście"],["16","szesnaście"],["17","siedemnaście"],["18","osiemnaście"],["19","dziewiętnaście"],["20","dwadzieścia"],["21","dwadzieścia jeden"],["30","trzydzieści"],["40","czterdzieści"],["50","pięćdziesiąt"],["60","sześćdziesiąt"],["70","siedemdziesiąt"],["80","osiemdziesiąt"],["90","dziewięćdziesiąt"],["100","sto"],["200","dwieście"],["300","trzysta"],["400","czterysta"],["500","pięćset"],["600","sześćset"],["700","siedemset"],["800","osiemset"],["900","dziewięćset"],["1000","tysiąc"]],"phrases":[]},{"id":"questions","title":"Frequently Asked Questions","eps":[4],"words":[],"phrases":[["what is it?","co to jest?"],["who is it?","kto to jest?"],["Is this...?","Czy to jest...?"],["Is there...?","Czy jest...?"],["Why?","Dlaczego?"],["When?","Kiedy?"],["What is going on?","Co się dzieje?"],["What happened?","co się stało?"],["Yes","Tak"],["Yes, please","Tak, poproszę"],["No","Nie"],["No, thanks","Nie, dziękuję"],["Fine","Dobrze"],["Maybe","Może"],["Of course","Oczywiście"],["Great!","Świetnie!"],["I want...","Chcę..."],["I want to book a room","Chcę zarezerwować pokój"],["I want to hire a guide","Chcę wynająć przewodnika"],["I need...","Potrzebuję..."],["I need a toothbrush","Potrzebuję szczoteczki do zębów"],["I need an interpreter","Potrzebuję tłumacza"],["I have to...","Muszę..."],["I have to take a shower","Muszę wziąć prysznic"],["I have to take my medicine","Muszę wziąć leki"],["I'm looking for...","Szukam..."],["I'm looking for an L size sweater","Szukam swetr w rozmiarze L"],["I would like... (masculine)","Chciałbym..."],["I would like...(feminine)","Chciałabym..."],["I would like to buy something to drink (masculine)","Chciałbym kupić coś do picia"],["I would like to by something to drink (feminine)","Chciałabym kupić coś do picia"],["I would like to make a phone call (masculine)","Chciałbym zatelefonować"],["I would like to make a phone call (feminine)","Chciałabym zatelefonować"],["Please give me...","Poproszę..."],["Please give me a ticket to Berlin","Poproszę bilet do Berlina"],["Please give me a kilogram of apples","Poproszę kilogram jabłek"],["Can I...","Czy mogę..."],["Can I sit here?","Czy mogę tu usiąść?"],["Can I use the phone?","Czy mogę skorzystać z telefonu?"],["Can I get a glass of water?","Czy mogę prosić o szklankę wody?"],["Do you have...","Czy masz..."],["Do you have a bandage?","Czy masz bandaż?"],["Do you have a moment?","Czy masz chwilę?"],["Can you help me?","Czy możesz mi pomóc?"],["Help!","Pomocy!"],["Please wait","Proszę poczekać."]]},{"id":"verbs","title":"Pronouns & Verbs","eps":[5],"words":[["I","ja"],["you (singular)","ty"],["he","on"],["she","ona"],["it","ono"],["we","my"],["you (plural)","wy"],["they (masculine)","oni"],["they (feminine/neutral)","one"]],"phrases":[],"kind":"verbs"},{"id":"colors","title":"Colors","eps":[6],"words":[["red (masculine)","czerwony"],["red (feminine)","czerwona"],["red (neutral)","czerwone"],["blue (masculine)","niebieski"],["blue (feminine)","niebieska"],["blue (neutral)","niebieskie"],["green (masculine)","zielony"],["green (feminine)","zielona"],["green (neutral)","zielone"],["purple (masculine)","fioletowy"],["purple (feminine)","fioletowa"],["purple (neutral)","fioletowe"],["black (masculine)","czarny"],["black (feminine)","czarna"],["black (neutral)","czarne"],["brown (masculine)","brązowy"],["brown (feminine)","brązowa"],["brown (neutral)","brązowe"],["yellow (masculine)","żółty"],["yellow (feminine)","żółta"],["yellow (neutral)","żółte"],["pink (masculine)","różowy"],["pink (feminine)","różowa"],["pink (neutral)","różowe"],["gray (masculine)","szary"],["gray (feminine)","szara"],["gray (neutral)","szare"],["white (masculine)","biały"],["white (feminine)","biała"],["white (neutral)","białe"],["orange (masculine)","pomarańczowy"],["orange (feminine)","pomarańczowa"],["orange (neutral)","pomarańczowe"]],"phrases":[]},{"id":"days","title":"Days of the Week","eps":[7],"words":[["Monday","poniedziałek"],["Tuesday","wtorek"],["Wednesday","środa"],["Thursday","czwartek"],["Friday","piątek"],["Saturday","sobota"],["Sunday","niedziela"],["is today...?","czy dzisiaj jest...?"],["when are we meeting?","kiedy się spotykamy?"],["can we meet on...?","czy możemy spotkać się w...?"],["what day of the week is today?","jaki jest dzisiaj dzień tygodnia?"],["today is...","dzisiaj jest..."],["today is...","dziś jest..."],["tomorrow is...","jutro jest..."],["yesterday was...","wczoraj był..."],["week","tydzień"],["month","miesiąc"],["year","rok"],["years","lata"]],"phrases":[]},{"id":"months","title":"Months","eps":[13],"words":[["January","styczeń"],["February","luty"],["March","marzec"],["April","kwiecień"],["May","maj"],["June","czerwiec"],["July","lipiec"],["August","sierpień"],["September","wrzesień"],["October","październik"],["November","listopad"],["December","grudzień"]],"phrases":[]},{"id":"conversation","title":"Basic Conversations","eps":[10],"words":[],"phrases":[["my name is...","nazywam się..."],["my name is...","mam na imię..."],["what's your name?","jak się nazywasz?"],["what's your name?","jak masz na imię?"],["where are you from?","skąd jesteś?"],["I am from Poland.","jestem z polski."],["I am Polish. (masculine)","jestem Polakiem."],["I am Polish. (feminine)","jestem Polką."],["I live in Warsaw.","mieszkam w Warszawie."],["nice to meet you sir/ma'am","miło mi pana/panią poznać."],["how old are you?","ile masz lat?"],["I am.... years old.","mam... lat."],["where do you work?","gdzie pracujesz?"],["what do you like doing in your free time?","co lubisz robić w wolnym czasie?"],["I work as a ...","pracuję jako..."],["are you married? (for him)","czy jesteś żonaty?"],["are you married? (for her)","czy jesteś mężatką?"],["do you have children?","czy masz dzieci?"],["how old are your children?","ile lat mają twoje dzieci?"],["do you like animals?","czy lubisz zwierzęta?"],["do you have a pet?","czy masz jakieś zwierzę?"],["do you like...?","czy lubisz...?"]]}]},{"id":"travel","name":"Travel & Getting Around","pl":"Podróże","topics":[{"id":"travel","title":"Travel","eps":[8],"words":[["bus","autobus"],["underground","metro"],["car","samochód / auto"],["highway / speedway","autostrada"],["train","pociąg"],["taxi","taksówka"],["airport","lotnisko"],["bus station","dworzec autobusowy"],["railway station","dworzec kolejowy"],["bus stop","przystanek autobusowy"],["car rental","wypożyczalnia samochodów"],["gas station","stacja benzynowa"],["ticket","bilet"],["is this bus going to the airport?","czy ten autobus jedzie na lotnisko?"],["where can I buy a ticket?","gdzie mogę kupić bilet?"],["can I rent a car for a few days?","czy mogę wypożyczyć samochód na kilka dni?"],["how much is the ticket?","ile kosztuje bilet?"],["which bus will get to the bus station?","którym autobusem dojadę do dworca?"],["please take me to Krakowska Street.","proszę zawieźć mnie na ulicę Krakowską."],["two tickets please.","poproszę dwa bilety."]],"phrases":[]},{"id":"directions","title":"Asking for Directions","eps":[9],"words":[["excuse me, where is...?","przepraszam, gdzie jest?"],["excuse me, where is .... street?","przepraszam, gdzie jest ulica...?"],["excuse me, how can I get to...?","przepraszam, jak dojść do...?"],["can you show me on the map?","czy może mi to pan/pani pokazać na mapie?"],["is it far?","czy to daleko?"],["I'm lost.","zgubiłem się."],["you have to go...","musi pan/pani iść..."],["to turn","skręcić"],["right","w prawo"],["left","w lewo"],["to return, come back","wrócić"],["to go straight ahead","iść prosto"],["behind the traffic lights","za światłami"],["you have to go straight","musi pan/pani iść prosto"],["you have to turn left","musi pan/pani skręcić w lewo"],["behind the traffic lights, turn left","za światłami proszę skręcić w lewo."],["where is the nearest bus stop?","gdzie jest najbliższy przystanek autobusowy?"],["excuse me, could you help me? I'm lost","czy może mi pan/pani pomóc? Zgubiłem się."],["where are you?","gdzie jesteś?"],["I'm on Warsaw street.","jestem na ulicy Warszawskiej."]],"phrases":[]},{"id":"airport","title":"Airport","eps":[11],"words":[["airport","lotnisko"],["air termnial","terminal"],["arrivals","przyloty"],["arrivals hall","hala przylotów"],["attention!","uwaga!"],["authorized personnel only","nieupoważnionym wstęp wzbroniony"],["baby changing station","pomieszczenie do przewijania niemowląt"],["baggage check-in","odprawa bagażowa"],["baggage claim","wydawanie bagażu"],["boarding","wejście na pokład"],["boarding time","godzina wejścia na pokład"],["cancelled","odwołany"],["car park","parking"],["car rental","wypożyczalnia samochodów"],["check-in","odprawa"],["children's playroom","kącik zabaw dla dzieci"],["closed","zamknięte"],["crosswalk","przejście dla pieszych"],["customs","odprawa celna"],["delayed","opóźniony"],["departures","odloty"]],"phrases":[]},{"id":"transport","title":"Transportation","eps":[42,43],"words":[["Train","Pociąg"],["Bus","Autobus"],["Taxi","Taksówka"],["Car","Samochód"],["Ticket","Bilet"],["Station","Stacja"],["Airport","Lotnisko"],["Plane","Samolot"],["Bicycle","Rower"],["Subway","Metro"],["Tram","Tramwaj"],["Ferry","Prom"],["Road","Droga"],["Highway","Autostrada"],["Bridge","Most"],["Street","Ulica"],["Stop","Przystanek"],["Departure","Odjazd"],["Arrival","Przyjazd"],["Schedule","Rozkład jazdy"],["Map","Mapa"],["Driver","Kierowca"],["Passenger","Pasażer"],["Seat","Miejsce"],["Luggage","Bagaż"]],"phrases":[["Where is the train station?","Gdzie jest dworzec kolejowy?"],["How much is a bus ticket?","Ile kosztuje bilet na autobus?"],["I’d like to buy a ticket to Kraków.","Chciałbym/Chciałabym kupić bilet do Krakowa."],["Is this seat taken?","Czy to miejsce jest zajęte?"],["When does the next train leave?","Kiedy odjeżdża następny pociąg?"],["Does this bus go to the city center?","Czy ten autobus jedzie do centrum?"],["I’m looking for a taxi.","Szukam taksówki."],["Can you take me to the airport?","Czy może mnie Pan/Pani zawieźć na lotnisko?"],["Where can I buy a ticket?","Gdzie mogę kupić bilet?"],["How long is the journey?","Jak długo trwa podróż?"],["Which platform is the train to Warsaw on?","Z którego peronu odjeżdża pociąg do Warszawy?"],["Is this the right way to the bus stop?","Czy to właściwa droga do przystanku autobusowego?"],["I’m lost, can you help me?","Zgubiłem/Zgubiłam się, czy może mi Pan/Pani pomóc?"],["I’d like to rent a car.","Chciałbym/Chciałabym wynająć samochód."],["How much does a taxi ride cost?","Ile kosztuje przejazd taksówką?"],["Do I need to validate my ticket?","Czy muszę skasować bilet?"],["Can I get a schedule?","Czy mogę dostać rozkład jazdy?"],["Is there a direct train to Gdańsk?","Czy jest bezpośredni pociąg do Gdańska?"],["How do I get to the metro station?","Jak dojdę do stacji metra?"],["What time does the bus arrive?","O której przyjeżdża autobus?"],["Can I pay by card?","Czy mogę zapłacić kartą?"],["Can I have a receipt, please?","Czy mogę prosić o paragon?"],["Where can I find a taxi stand?","Gdzie mogę znaleźć postój taksówek?"],["Is there Wi-Fi on this train?","Czy w tym pociągu jest Wi-Fi?"],["Excuse me, can you tell me where the exit is?","Przepraszam, czy może mi Pan/Pani powiedzieć, gdzie jest wyjście?"]]},{"id":"customs","title":"Passport & Customs","eps":[81,82],"words":[["Passport","Paszport"],["Visa","Wiza"],["Customs","Odprawa celna"],["Immigration","Imigracja"],["Border control","Kontrola graniczna"],["Travel document","Dokument podróży"],["ID card","Dowód osobisty"],["Ticket","Bilet"],["Customs declaration","Deklaracja celna"],["Luggage check","Kontrola bagażu"],["Carry-on luggage","Bagaż podręczny"],["Checked baggage","Bagaż rejestrowany"],["Customs officer","Celnik"],["Security check","Kontrola bezpieczeństwa"],["Arrival","Przylot"],["Departure","Odlot"],["Flight number","Numer lotu"],["Travel itinerary","Plan podróży"],["Prohibited items","Przedmioty zabronione"],["Duty-free","Strefa bezcłowa"],["Currency","Waluta"],["Stamp","Pieczątka"],["Traveler","Podróżnik"],["Inspection","Kontrola"],["Baggage claim","Odbiór bagażu"]],"phrases":[["Here is my passport.","Oto mój paszport."],["Do I need a visa?","Czy potrzebuję wizy?"],["Where is customs?","Gdzie jest odprawa celna?"],["I am here for tourism.","Jestem tutaj w celach turystycznych."],["I am here on business.","Jestem tutaj w celach służbowych."],["I am staying for two weeks.","Zostanę na dwa tygodnie."],["Where are you staying?","Gdzie się zatrzymujesz?"],["I am staying at a hotel.","Zatrzymuję się w hotelu."],["Do you have anything to declare?","Czy masz coś do zadeklarowania?"],["I have nothing to declare.","Nie mam nic do zadeklarowania."],["What is in your luggage?","Co masz w bagażu?"],["These are personal items.","To są rzeczy osobiste."],["Can you open your bag?","Czy możesz otworzyć swoją torbę?"],["Are these prohibited items?","Czy to są przedmioty zabronione?"],["Can I take this with me?","Czy mogę to zabrać ze sobą?"],["What is the purpose of your visit?","Jaki jest cel twojej wizyty?"],["How long will you be staying?","Jak długo będziesz tutaj przebywać?"],["Please fill out this customs declaration.","Proszę wypełnić tę deklarację celną."],["Where can I pick up my luggage?","Gdzie mogę odebrać swój bagaż?"],["Can I have a receipt for this?","Czy mogę dostać paragon za to?"],["Is there a currency exchange here?","Czy jest tutaj kantor wymiany walut?"],["I need to speak with a customs officer.","Muszę porozmawiać z celnikiem."],["Where can I find the immigration office?","Gdzie znajdę urząd imigracyjny?"],["What documents do I need?","Jakie dokumenty są potrzebne?"],["Thank you for your assistance.","Dziękuję za pomoc."]]},{"id":"car","title":"Car Rental","eps":[84,85],"words":[["Car rental","Wynajem samochodów"],["Reservation","Rezerwacja"],["Insurance","Ubezpieczenie"],["Driver's license","Prawo jazdy"],["Pick-up location","Miejsce odbioru"],["Drop-off location","Miejsce zwrotu"],["Compact car","Samochód kompaktowy"],["SUV","SUV"],["Automatic transmission","Automatyczna skrzynia biegów"],["Manual transmission","Manualna skrzynia biegów"],["Mileage","Przebieg"],["Unlimited mileage","Nielimitowany przebieg"],["Fuel policy","Polityka paliwowa"],["Full tank","Pełny bak"],["GPS","Nawigacja GPS"],["Child seat","Fotelik dziecięcy"],["Additional driver","Dodatkowy kierowca"],["Deposit","Kaucja"],["Damage waiver","Zwolnienie z odpowiedzialności za szkody"],["Agreement","Umowa"],["Penalty","Kara"],["Return time","Czas zwrotu"],["Late fee","Opłata za spóźnienie"],["Roadside assistance","Pomoc drogowa"],["Vehicle inspection","Kontrola pojazdu"]],"phrases":[["I would like to rent a car.","Chciałbym/Chciałabym wynająć samochód."],["Do you have any cars available?","Czy macie dostępne samochody?"],["What’s the cost per day?","Jaki jest koszt za dzień?"],["Can I see the rental agreement?","Czy mogę zobaczyć umowę najmu?"],["Is insurance included?","Czy ubezpieczenie jest wliczone w cenę?"],["Do I need to pay a deposit?","Czy muszę wpłacić kaucję?"],["Is roadside assistance included?","Czy pomoc drogowa jest wliczona?"],["Can I add an additional driver?","Czy mogę dodać dodatkowego kierowcę?"],["Do you have cars with automatic transmission?","Czy macie samochody z automatyczną skrzynią biegów?"],["I’d like to rent the car for three days.","Chciałbym/Chciałabym wynająć samochód na trzy dni."],["Where can I pick up the car?","Gdzie mogę odebrać samochód?"],["What is the return policy?","Jaka jest polityka zwrotów?"],["Is there a penalty for late return?","Czy jest kara za spóźniony zwrot?"],["Can I return the car to a different location?","Czy mogę zwrócić samochód w innym miejscu?"],["How much is the fuel charge?","Ile wynosi opłata za paliwo?"],["I need a child seat.","Potrzebuję fotelika dziecięcego."],["Does the car come with GPS?","Czy samochód jest wyposażony w nawigację GPS?"],["Are there any additional fees?","Czy są jakieś dodatkowe opłaty?"],["Can I pay by credit card?","Czy mogę zapłacić kartą kredytową?"],["The car has a scratch/damage.","Samochód ma rysę/uszkodzenie."],["I need to extend my rental.","Chciałbym/Chciałabym przedłużyć wynajem."],["Where should I drop off the car?","Gdzie powinienem/powinnam zwrócić samochód?"],["The car won’t start.","Samochód nie chce się uruchomić."],["Can I cancel my reservation?","Czy mogę anulować swoją rezerwację?"],["Thank you for your assistance.","Dziękuję za pomoc."]]},{"id":"train","title":"Travelling by Train","eps":[87,88],"words":[["Train","Pociąg"],["Station","Stacja"],["Platform","Peron"],["Ticket","Bilet"],["Timetable","Rozkład jazdy"],["Departure","Odjazd"],["Arrival","Przyjazd"],["One-way ticket","Bilet w jedną stronę"],["Return ticket","Bilet powrotny"],["Seat reservation","Rezerwacja miejsca"],["Luggage","Bagaż"],["First class","Pierwsza klasa"],["Second class","Druga klasa"],["Express train","Pociąg ekspresowy"],["Intercity train","Pociąg międzymiastowy"],["Local train","Pociąg lokalny"],["Sleeper car","Wagon sypialny"],["Dining car","Wagon restauracyjny"],["Compartment","Przedział"],["Conductor","Konduktor"],["Track","Tor"],["Delay","Opóźnienie"],["Fine/penalty","Kara"],["Ticket office","Kasa biletowa"],["Journey","Podróż"]],"phrases":[["Where can I buy a ticket?","Gdzie mogę kupić bilet?"],["How much is a ticket to [city]?","Ile kosztuje bilet do [miasto]?"],["I need a one-way ticket.","Potrzebuję bilet w jedną stronę."],["I need a return ticket.","Potrzebuję bilet powrotny."],["What time does the train to [city] leave?","O której odjeżdża pociąg do [miasto]?"],["What platform is it departing from?","Z którego peronu odjeżdża?"],["Is this the right train for [city]?","Czy to jest właściwy pociąg do [miasto]?"],["Can I reserve a seat?","Czy mogę zarezerwować miejsce?"],["Where can I find the timetable?","Gdzie mogę znaleźć rozkład jazdy?"],["When will the train arrive?","Kiedy pociąg przyjedzie?"],["Is the train delayed?","Czy pociąg ma opóźnienie?"],["Where is the ticket office?","Gdzie jest kasa biletowa?"],["Can I pay with a card?","Czy mogę zapłacić kartą?"],["Excuse me, where is platform 3?","Przepraszam, gdzie jest peron trzeci?"],["I’m looking for the dining car.","Szukam wagonu restauracyjnego."],["Do I need to change trains?","Czy muszę się przesiadać?"],["How long is the journey to [city]?","Jak długo trwa podróż do [miasto]?"],["Can I bring luggage on the train?","Czy mogę zabrać bagaż do pociągu?"],["Does this train have Wi-Fi?","Czy ten pociąg ma Wi-Fi?"],["Can you help me with my luggage?","Czy możesz mi pomóc z bagażem?"],["Where is the nearest exit?","Gdzie jest najbliższe wyjście?"],["Do you know when the next train arrives?","Czy wiesz, kiedy przyjedzie następny pociąg?"],["Can I get a refund for this ticket?","Czy mogę otrzymać zwrot za ten bilet?"],["I need help finding my seat.","Potrzebuję pomocy w znalezieniu miejsca."],["Thank you for your assistance.","Dziękuję za pomoc."]]},{"id":"vacation","title":"Vacation","eps":[78,79],"words":[["Vacation","Wakacje"],["Trip","Podróż"],["Destination","Cel podróży"],["Travel","Podróżowanie"],["Ticket","Bilet"],["Passport","Paszport"],["Hotel","Hotel"],["Accommodation","Zakwaterowanie"],["Luggage","Bagaż"],["Flight","Lot"],["Beach","Plaża"],["Tour","Wycieczka"],["Map","Mapa"],["Guidebook","Przewodnik"],["Adventure","Przygoda"],["Relaxation","Relaks"],["Tourist","Turysta/Turystka"],["Sightseeing","Zwiedzanie"],["Souvenir","Pamiątka"],["Airport","Lotnisko"],["Vacation spot","Miejsce wypoczynku"],["Transportation","Transport"],["Cruise","Rejs"],["Backpack","Plecak"],["Summer","Lato"]],"phrases":[["Where can I buy a ticket?","Gdzie mogę kupić bilet?"],["I’d like to book a hotel room.","Chciałbym/Chciałabym zarezerwować pokój w hotelu."],["How much is a ticket to…?","Ile kosztuje bilet do…?"],["What time does the train/flight leave?","O której odjeżdża pociąg/odlatuje samolot?"],["Do you have any recommendations?","Czy masz jakieś rekomendacje?"],["Where is the nearest beach?","Gdzie jest najbliższa plaża?"],["Can I have a map, please?","Czy mogę prosić o mapę?"],["I’d like to rent a car.","Chciałbym/Chciałabym wynająć samochód."],["Do you speak English?","Czy mówisz po angielsku?"],["Can you help me find this address?","Czy możesz mi pomóc znaleźć ten adres?"],["How far is it from here?","Jak daleko to stąd?"],["I’m looking for a good restaurant.","Szukam dobrej restauracji."],["Can you recommend a local dish?","Czy możesz polecić lokalne danie?"],["What are the must-see attractions?","Jakie są atrakcje, które trzeba zobaczyć?"],["Is this the right bus/train?","Czy to jest właściwy autobus/pociąg?"],["Can I get a receipt, please?","Czy mogę prosić o paragon?"],["Where can I exchange money?","Gdzie mogę wymienić pieniądze?"],["What time does the museum open/close?","O której otwiera/zamyka się muzeum?"],["I’d like to join a tour group.","Chciałbym/Chciałabym dołączyć do grupy wycieczkowej."],["Where is the nearest pharmacy?","Gdzie jest najbliższa apteka?"],["Do you accept credit cards?","Czy akceptujecie karty kredytowe?"],["Is breakfast included?","Czy śniadanie jest wliczone w cenę?"],["I’m lost. Can you help me?","Zgubiłem/Zgubiłam się. Czy możesz mi pomóc?"],["Where is the tourist information center?","Gdzie jest punkt informacji turystycznej?"],["Can you take a photo for me?","Czy możesz zrobić mi zdjęcie?"]]},{"id":"sightseeing","title":"Sightseeing","eps":[102,103],"words":[["Sightseeing","Zwiedzanie"],["Landmark","Zabytek"],["Tourist","Turysta/Turystka"],["Map","Mapa"],["Guide","Przewodnik"],["Tour","Wycieczka"],["Monument","Pomnik"],["Museum","Muzeum"],["Castle","Zamek"],["Cathedral","Katedra"],["Park","Park"],["Square","Plac"],["Market","Targ"],["Bridge","Most"],["River","Rzeka"],["Viewpoint","Punkt widokowy"],["Photography","Fotografia"],["Admission ticket","Bilet wstępu"],["Opening hours","Godziny otwarcia"],["History","Historia"],["Art gallery","Galeria sztuki"],["Walking tour","Wycieczka piesza"],["Audio guide","Przewodnik audio"],["Gift shop","Sklep z pamiątkami"],["Souvenir","Pamiątka"]],"phrases":[["Where is the nearest tourist information center?","Gdzie jest najbliższe biuro informacji turystycznej?"],["Can you recommend any landmarks?","Czy możesz polecić jakieś zabytki?"],["How do I get to the museum?","Jak dojść do muzeum?"],["Is there a guided tour available?","Czy jest dostępna wycieczka z przewodnikiem?"],["I’d like to book a walking tour.","Chciałbym/Chciałabym zarezerwować wycieczkę pieszą."],["What are the opening hours?","Jakie są godziny otwarcia?"],["How much is the admission ticket?","Ile kosztuje bilet wstępu?"],["Do you offer student discounts?","Czy oferujecie zniżki dla studentów?"],["Is photography allowed here?","Czy można tutaj robić zdjęcia?"],["Can you tell me about the history of this place?","Czy możesz opowiedzieć o historii tego miejsca?"],["Where is the best viewpoint?","Gdzie jest najlepszy punkt widokowy?"],["Can I have a map, please?","Czy mogę prosić o mapę?"],["I’d like an audio guide in English.","Chciałbym/Chciałabym przewodnik audio w języku angielskim."],["Where can I buy souvenirs?","Gdzie mogę kupić pamiątki?"],["This place is so beautiful!","To miejsce jest takie piękne!"],["How far is the castle from here?","Jak daleko stąd jest zamek?"],["Are there any restaurants nearby?","Czy w pobliżu są jakieś restauracje?"],["Can we stop for a photo here?","Czy możemy się tutaj zatrzymać na zdjęcie?"],["I’d like to visit the art gallery.","Chciałbym/Chciałabym odwiedzić galerię sztuki."],["Do you have any brochures in Polish?","Czy macie jakieś broszury w języku polskim?"],["What time does the last tour start?","O której zaczyna się ostatnia wycieczka?"],["I’m looking for the main square.","Szukam głównego placu."],["Can you take a photo of me, please?","Czy możesz zrobić mi zdjęcie?"],["I want to learn more about local traditions.","Chcę dowiedzieć się więcej o lokalnych tradycjach."],["Thank you for your help!","Dziękuję za pomoc!"]]}]},{"id":"out","name":"Eating, Staying & Shopping","pl":"Na mieście","topics":[{"id":"hotel","title":"Accommodations","eps":[12],"words":[["hotel","hotel"],["youth hostel","schronisko"],["single room","pokój jednoosobowy"],["double room","pokój dwuosobowy"],["room with a bathroom","pokój z łazienką"],["passport","paszport"],["cash","gotówka"],["credit card","karta kredytowa"],["do you have any free rooms?","czy macie państwo wolne pokoje?"],["I have a reservation","mam rezerwację."],["can I pay with a credit card?","czy mogę zapłacić kartą kredytową?"],["how much is it?","ile to kosztuje?"],["can I have a bill please?","poproszę o rachunek."],["what time is breakfast?","o której jest śniadanie?"],["where is the restaurant?","gdzie jest restauracja?"],["towel","ręcznik"],["could I ask for a towel change in my room?","czy mógłbym prosić o wymianę ręczników w moim pokoju?"],["double bed","łóżko podwójne"],["single bed","łóżko pojedyncze"],["what is the wifi password?","jakie jest hasło do wifi?"]],"phrases":[]},{"id":"accommodation","title":"Accommodation Phrases","eps":[90,91],"words":[["Hotel","Hotel"],["Hostel","Hostel"],["Apartment","Apartament"],["Room","Pokój"],["Reservation","Rezerwacja"],["Check-in","Zameldowanie"],["Check-out","Wymeldowanie"],["Key","Klucz"],["Reception","Recepcja"],["Booking confirmation","Potwierdzenie rezerwacji"],["Guest","Gość"],["Single room","Pokój jednoosobowy"],["Double room","Pokój dwuosobowy"],["Suite","Apartament (w hotelu)"],["Bed and breakfast","Nocleg ze śniadaniem"],["Air conditioning","Klimatyzacja"],["Wi-Fi","Wi-Fi"],["Bathroom","Łazienka"],["Towels","Ręczniki"],["Laundry service","Usługa pralni"],["Parking","Parking"],["Room service","Obsługa pokojowa"],["Luggage storage","Przechowalnia bagażu"],["Cancellation","Anulowanie"],["Late check-out","Późne wymeldowanie"]],"phrases":[["I would like to book a room.","Chciałbym/Chciałabym zarezerwować pokój."],["Do you have any available rooms?","Czy macie dostępne pokoje?"],["How much is a single/double room per night?","Ile kosztuje pokój jednoosobowy/dwuosobowy za noc?"],["Is breakfast included?","Czy śniadanie jest wliczone w cenę?"],["Can I see the room before booking?","Czy mogę zobaczyć pokój przed rezerwacją?"],["What time is check-in/check-out?","O której jest zameldowanie/wymeldowanie?"],["I have a reservation under the name [name].","Mam rezerwację na nazwisko [nazwisko]."],["Can I get a late check-out?","Czy mogę później się wymeldować?"],["Where is the reception?","Gdzie jest recepcja?"],["Does the room have Wi-Fi?","Czy pokój ma Wi-Fi?"],["Is there air conditioning in the room?","Czy w pokoju jest klimatyzacja?"],["Do you offer room service?","Czy oferujecie obsługę pokojową?"],["Can I have extra towels?","Czy mogę prosić o dodatkowe ręczniki?"],["Where is the nearest parking lot?","Gdzie jest najbliższy parking?"],["Can I store my luggage here?","Czy mogę tutaj przechować bagaż?"],["Is there a laundry service available?","Czy jest dostępna usługa pralni?"],["The room is not clean.","Pokój nie jest czysty."],["The air conditioning isn’t working.","Klimatyzacja nie działa."],["Can I change rooms?","Czy mogę zmienić pokój?"],["How do I access the Wi-Fi?","Jak mogę uzyskać dostęp do Wi-Fi?"],["I lost my room key.","Zgubiłem/Zgubiłam klucz do pokoju."],["What time is breakfast served?","O której podawane jest śniadanie?"],["Is there a restaurant in the hotel?","Czy w hotelu jest restauracja?"],["Can I pay with a credit card?","Czy mogę zapłacić kartą kredytową?"],["Thank you for your assistance.","Dziękuję za pomoc."]]},{"id":"restaurant","title":"Restaurant","eps":[44,45],"words":[["Restaurant","Restauracja"],["Menu","Menu"],["Waiter/Waitress","Kelner/Kelnerka"],["Table","Stół"],["Reservation","Rezerwacja"],["Fork","Widelec"],["Knife","Nóż"],["Spoon","Łyżka"],["Napkin","Serwetka"],["Plate","Talerz"],["Glass","Szklanka"],["Bill/Check","Rachunek"],["Tip","Napiwek"],["Drink","Napój"],["Dish","Danie"],["Appetizer","Przystawka"],["Main Course","Danie główne"],["Dessert","Deser"],["Soup","Zupa"],["Salad","Sałatka"],["Bread","Chleb"],["Water","Woda"],["Wine","Wino"],["Beer","Piwo"],["Tea","Herbata"]],"phrases":[["I would like to make a reservation.","Chciałbym/Chciałabym zrobić rezerwację."],["How many people?","Ile osób?"],["Do you have a table for two?","Czy macie stolik dla dwóch osób?"],["Can I see the menu, please?","Czy mogę zobaczyć menu?"],["What do you recommend?","Co Pan/Pani poleca?"],["I would like to order, please.","Chciałbym/Chciałabym zamówić, proszę."],["Can I have water, please?","Czy mogę prosić wodę?"],["I’ll have the soup and the salad.","Poproszę zupę i sałatkę."],["Is this dish vegetarian?","Czy to danie jest wegetariańskie?"],["What is today’s special?","Co jest dzisiaj w menu specjalnym?"],["Can I get this without meat?","Czy mogę to dostać bez mięsa?"],["Could I have some more bread?","Czy mogę prosić więcej chleba?"],["I’d like the same, please.","Poproszę to samo."],["I’m allergic to nuts.","Mam alergię na orzechy."],["Can I have the bill, please?","Czy mogę prosić rachunek?"],["Do you accept credit cards?","Czy akceptujecie karty kredytowe?"],["I’ll pay in cash.","Zapłacę gotówką."],["Can I get a receipt, please?","Czy mogę dostać paragon?"],["How much is the tip?","Ile wynosi napiwek?"],["The food was delicious!","Jedzenie było pyszne!"],["Can I order dessert?","Czy mogę zamówić deser?"],["I’d like a coffee, please.","Poproszę kawę."],["Is there a children’s menu?","Czy jest menu dla dzieci?"],["Can we sit outside?","Czy możemy usiąść na zewnątrz?"],["I don’t understand the menu. Can you explain it?","Nie rozumiem menu. Czy może mi Pan/Pani wyjaśnić?"]]},{"id":"restaurant2","title":"At the Restaurant","eps":[96,97],"words":[["Restaurant","Restauracja"],["Menu","Menu"],["Reservation","Rezerwacja"],["Table","Stół"],["Waiter","Kelner"],["Waitress","Kelnerka"],["Bill/Check","Rachunek"],["Tip","Napiwek"],["Fork","Widelec"],["Knife","Nóż"],["Spoon","Łyżka"],["Plate","Talerz"],["Glass","Szklanka"],["Napkin","Serwetka"],["Appetizer","Przystawka"],["Main course","Danie główne"],["Dessert","Deser"],["Drink","Napój"],["Water","Woda"],["Wine","Wino"],["Beer","Piwo"],["Vegetarian","Wegetariański"],["Allergies","Alergie"],["Delicious","Pyszne"],["Bon Appétit!","Smacznego!"]],"phrases":[["I’d like to make a reservation for two.","Chciałbym/Chciałabym zarezerwować stolik dla dwóch osób."],["Do you have a table available?","Czy macie wolny stolik?"],["Can I see the menu, please?","Czy mogę prosić o menu?"],["What do you recommend?","Co polecacie?"],["I’d like to order now.","Chciałbym/Chciałabym złożyć zamówienie."],["Can I have some water, please?","Czy mogę prosić wodę?"],["Do you have any vegetarian options?","Czy macie opcje wegetariańskie?"],["I have a food allergy.","Mam alergię na jedzenie."],["What’s the soup of the day?","Jaka jest zupa dnia?"],["Can I get the same dish as them?","Czy mogę dostać to samo danie co oni?"],["How long will it take?","Jak długo to potrwa?"],["Could you bring some extra napkins?","Czy moglibyście przynieść dodatkowe serwetki?"],["This tastes delicious!","To smakuje pysznie!"],["Can I have the bill, please?","Czy mogę prosić o rachunek?"],["Do you accept credit cards?","Czy akceptujecie karty kredytowe?"],["Can I pay with cash?","Czy mogę zapłacić gotówką?"],["Is service included in the bill?","Czy obsługa jest wliczona w rachunek?"],["Can I get a receipt, please?","Czy mogę prosić o paragon?"],["I’d like to split the bill.","Chciałbym/Chciałabym podzielić rachunek."],["Do you offer takeout?","Czy oferujecie jedzenie na wynos?"],["Can I take the leftovers home?","Czy mogę zabrać resztki do domu?"],["The food was amazing. Thank you!","Jedzenie było niesamowite. Dziękuję!"],["Do you have any dessert options?","Czy macie jakieś desery?"],["Could you bring a high chair for the baby?","Czy moglibyście przynieść krzesełko dla dziecka?"],["Thank you for your service.","Dziękuję za obsługę."]]},{"id":"shopping","title":"Shopping & Groceries","eps":[46,47],"words":[["Store","Sklep"],["Market","Targ"],["Grocery Store","Sklep spożywczy"],["Supermarket","Supermarket"],["Cash register","Kasa"],["Shopping cart","Wózek"],["Bag","Torba"],["Price","Cena"],["Discount","Zniżka"],["Receipt","Paragon"],["Change","Reszta"],["Cash","Gotówka"],["Card","Karta"],["Vegetables","Warzywa"],["Fruits","Owoce"],["Meat","Mięso"],["Bread","Chleb"],["Milk","Mleko"],["Cheese","Ser"],["Eggs","Jajka"],["Water","Woda"],["Juice","Sok"],["Clothes","Ubrania"],["Shoes","Buty"],["Sale","Wyprzedaż"]],"phrases":[["How much does this cost?","Ile to kosztuje?"],["Can I pay by card?","Czy mogę zapłacić kartą?"],["Do you accept cash?","Czy przyjmujecie gotówkę?"],["Where is the nearest supermarket?","Gdzie jest najbliższy supermarket?"],["Can I have a receipt, please?","Czy mogę prosić o paragon?"],["Where can I find bread?","Gdzie mogę znaleźć chleb?"],["I’m looking for eggs.","Szukam jajek."],["Do you have any discounts?","Czy macie jakieś zniżki?"],["Is this on sale?","Czy to jest na wyprzedaży?"],["Can I try this on?","Czy mogę to przymierzyć?"],["Where is the fitting room?","Gdzie jest przymierzalnia?"],["I need a smaller size.","Potrzebuję mniejszego rozmiaru."],["I need a larger size.","Potrzebuję większego rozmiaru."],["Do you have this in another color?","Czy macie to w innym kolorze?"],["Where is the checkout?","Gdzie jest kasa?"],["How much change do I get?","Ile reszty dostanę?"],["Can I pay in installments?","Czy mogę zapłacić na raty?"],["How long is the sale going on?","Jak długo trwa wyprzedaż?"],["I don’t have a bag. Can I buy one?","Nie mam torby. Czy mogę kupić jedną?"],["Can you help me find this item?","Czy może mi Pan/Pani pomóc znaleźć ten przedmiot?"],["I’m just browsing.","Tylko oglądam."],["Do you have fresh vegetables?","Czy macie świeże warzywa?"],["I’d like to return this, please.","Chciałbym/Chciałabym to zwrócić, proszę."],["Can I exchange this item?","Czy mogę wymienić ten przedmiot?"],["Is there a warranty on this product?","Czy na ten produkt jest gwarancja?"]]}]},{"id":"home","name":"Home & Daily Life","pl":"Dom","topics":[{"id":"apartment","title":"Home & Apartment","eps":[20,21],"words":[["accommodation","zakwaterowanie"],["apartment","mieszkanie"],["balcony","balkon"],["dream house","wymarzony dom"],["to evict","eksmitować"],["single family house","som jednorodzinny"],["flatmate","współlokator"],["gate","furtka"],["to have nowhere to live","nie mieć gdzie mieszkać"],["hedge","żywopłot"],["house","dom"],["house owner","właściciel domu"],["housing conditions","warunki mieszkaniowe"],["housing shortage","brak mieszkań"],["mail box","skrzynka na listy"],["mortgage","hipoteka"],["to move in","wprowadzić się"],["to move out","wyprowadzić się"],["real estate","nieruchomość"],["rent","czynsz"],["rent agreement","umowa najmu"],["rent arrears","zaległość w płaceniu czynszu"],["rented","wynajęty"],["roof","dach"],["renter","lokator"],["semi-detached house","bliźniak"],["sewage system","kanalizacja"],["stairwell","klatka schodowa"],["studio apartment","kawalerka"],["temporary home","dom tymczasowy"]],"phrases":[["Do you pay rent on time?","Czy płacisz czynsz w terminie?"],["He climbed the ladder to the attic","Wspiął się po drabinie na strych"],["He found the right apartament","Znalazł właściwe mieszkanie"],["He rang the doorbell","Zadzwonił na dzwonek"],["He turned the key","Przekręcił klucz"],["He left home when he was seven","Wyniósł się z domu, kiedy miał 7 lat"],["He leased the apartment","Wynajął mieszkanie"],["He got off the elevator on the top floor","Wysiadł z windy na ostatnim piętrze"],["His parents moved away","Jego rodzice przeprowadzili się"],["I came home yesterday","Przyjechałam do domu wczoraj"],["It was an old two-storied house","To był dwu-piętrowy dom"],["He hurried up the stairs behind her","On popędził za nią po schodach"],["They moved many times","Przeprowadzili się wiele razy"],["Where are you going to live?","Gdzie masz zamiar mieszkać?"]]},{"id":"inhome","title":"In the Home","eps":[30,31],"words":[["door","drzwi"],["kitchen","kuchnia"],["living room","salon"],["bedroom","sypialnia"],["hall","przedpokój"],["cellar","piwnica"],["bathroom","łazienka"],["dining room","jadalnia"],["attic","strych"],["ceiling","sufit"],["doorbell","dzwonek"],["floor","podłoga"],["shower","prysznic"],["window","okno"],["wall","ściana"],["stairs","schody"],["ground floor","parter"],["first floor","pierwsze piętro"],["garden","ogród"],["washing machine","pralka"],["garage","garaż"],["furniture","meble"],["pool","basen"],["oven","piec"],["lamp","lampa"],["carpet","wykładzina"],["house","dom"],["roommate","współlokator"],["dishes","naczynia"],["bed","łóżko"],["TV","telewizor"],["fan","wiatrak"],["bath","wanna"],["table","stół"],["couch","kanapa"],["dishwasher","zmywarka"]],"phrases":[["Could you turn the light on?","Czy mógłbyś włączyć światło?"],["Please take off your shoes","Proszę zdejmij buty"],["Would you like me to show you around?","Czy chciałbyś żebym Cię oprowadził?"],["Do you want some tea?","Czy chciałbyś herbaty?"],["Make yourself at home","Poczuj się jak w domu"],["Please lock the door","Proszę zamknij drzwi"],["I like your house","Podoba mi się Twój dom"],["How are your neighbors?","Jacy są Twoi sąsiedzi?"],["Where do you live?","Gdzie mieszkasz?"],["Watch out for my dog","Uważaj na psa"],["That's a great view","Super widok"],["I just moved in","Właśnie się wprowadziłem"],["I'm sorry for the mess","Przepraszam za bałagan"],["How long have you lived here?","Jak długo tu już mieszkasz?"],["I'm looking for a new house","Szukam nowego domu"],["The neighbors are very loud","Sąsiedzi są bardzo głośni"],["My roommate is very clean","Mój współlokator jest bardzo czysty"],["I like this area","Podoba mi się ta okolica"],["I am still renovating this room","Wciąż remontuję ten pokój"],["Welcome home","Witaj w domu"]]},{"id":"hygiene","title":"Hygiene","eps":[32,33],"words":[["toothpaste","pasta do zębów"],["toothbrush","szczoteczka do zębów"],["brush","szczotkować"],["soap","mydło"],["dry","suszyć"],["bathe","brać kąpiel"],["laundry","pranie"],["sponge","gąbka"],["comb","grzebień"],["towel","ręcznik"],["shave","golić"],["razor","żyletka"],["nail clippers","obcinacz do paznokci"],["scrub","szorować"],["dirty","brudny"],["smelly","śmierdzący"],["well kept","dobrze utrzymany"],["messy","niechlujny"],["muddy","obłocony"],["stain","plama"],["file","piłować"],["paint","malować"],["shower","brać prysznic"],["toilet paper","papier toaletowy"],["iron","żelazko"],["rinse","opłukać"],["shampoo","szampon"],["conditioner","odżywka"],["dental floss","nitka do zębów"],["flush the toilet","spłukać toaletę"]],"phrases":[["Wash your hands before eating","Umyj ręce przed jedzeniem"],["Is the restroom occupied?","Czy toaleta jest zajęta?"],["You have something stuck in your teeth","Coś utknęło Ci między zębami"],["I like your perfume","Podoba mi się Twoja perfuma"],["Take care of yourself","Dbać o siebie"],["Would you like a breath mint?","Czy chciałbyś miętówkę?"],["You need to shave","Powinieneś się ogolić"],["Your breath stinks","Twój oddech śmierdzi"],["How often do you wash your hair?","Jak często myjesz włosy?"],["Did you dye your hair?","Czy przefarbowałaś wlosy?"],["Dry your hair","Wysusz włosy"],["You should brush your teeth regularly","Powinieneś regularnie myć zęby"],["You have a stain on your shirt","Masz plamę na koszulce"],["Did you want to use the shower?","Czy chciałbyś skorzystać z prysznica?"],["Could you pass me the towel?","Czy mógłbyś podać mi ręcznik?"],["I need to freshen up","Muszę się odświeżyć"],["Could you fill up the bath?","Czy mógłbyś napełnić wannę?"],["I need to go to the barber","Muszę pójść do fryzjera"],["I ran out of shampoo","Skończył mi się szampon"]]},{"id":"cleaning","title":"Cleaning","eps":[34,35],"words":[["to clean","czyścić"],["bleach","wybielacz"],["drying rack","suszarka"],["chores","obowiązki domowe"],["mop","mop"],["broom","miotła"],["rag","ścierka"],["vacuum","odkurzacz"],["mess","bałagan"],["dust","kurz"],["tidy","uporządkować"],["bucket","wiaderko"],["to sweep","zamiatać"],["rust","rdza"],["paper towel","ręcznik papierowy"],["pile","stos"],["to sort","sortować"],["to put away","odłożyć"],["to wipe","ścierać"],["to repair","naprawiać"],["to disinfect","dezynfekować"],["to refresh","odświeżać"],["liquid","płyn"]],"phrases":[["Wash the dishes","Zmywać naczynia"],["Sweep the floor","Pozamiatać podłogę"],["Hang up the laundry","Powiesić pranie"],["Set the dishwasher","Ustawić zmywarkę"],["Can you clean that up?","Czy mógłbyś to posprzątać?"],["Where are your cleaning supplies?","Gdzie są środki do czyszczenia?"],["The kitchen looks spotless","Kuchnia wygląda nieskazitelnie"],["Something got spilled there","Coś się tam rozlało"],["The room is very dusty","Pokój jest bardzo zakurzony"],["You need to scrub harder","Musisz mocniej szorować"],["Did you finish your chores?","Czy skończyłeś swoje obowiązki domowe?"],["I'll help you clean up","Pomogę Ci w sprzątaniu"],["Careful, the floor is still wet","Ostrożnie, podłoga jest nadal mokra"],["Take out the trash","Wynieś śmieci"],["Did you vacuum the carpet?","Czy odkurzyłeś wykładzinę?"],["Could you pass me the brush?","Czy mógłbyś podać mi szczotkę?"],["His room was messy","Jego pokój był zabałaganiony"],["Organize your toys","Uporządkuj swoje zabawki"],["Make the bed","Pościelić łóżko"]]},{"id":"finances","title":"Household Finances","eps":[72,73],"words":[["Budget","Budżet"],["Income","Dochód"],["Expense","Wydatek"],["Savings","Oszczędności"],["Debt","Dług"],["Loan","Pożyczka"],["Interest","Odsetki"],["Mortgage","Kredyt hipoteczny"],["Bank account","Konto bankowe"],["Deposit","Depozyt"],["Withdrawal","Wypłata"],["Check (payment)","Czek"],["Credit card","Karta kredytowa"],["Debit card","Karta debetowa"],["Bill","Rachunek"],["Payment","Płatność"],["Rent","Czynsz"],["Utilities","Media"],["Electricity","Prąd"],["Gas","Gaz"],["Water","Woda"],["Insurance","Ubezpieczenie"],["Investment","Inwestycja"],["Salary","Pensja"],["Financial plan","Plan finansowy"]],"phrases":[["I need to create my budget.","Muszę stworzyć mój budżet."],["How much is the rent?","Ile wynosi czynsz?"],["Did you pay the electricity bill?","Czy zapłaciłeś/zapłaciłaś rachunek za prąd?"],["I want to save more money this month.","Chcę zaoszczędzić więcej pieniędzy w tym miesiącu."],["Can we afford this?","Czy możemy sobie na to pozwolić?"],["How much do we spend on groceries?","Ile wydajemy na zakupy spożywcze?"],["We need to reduce our expenses.","Musimy zmniejszyć nasze wydatki."],["The water bill is due next week.","Rachunek za wodę jest do zapłacenia w przyszłym tygodniu."],["I’ll pay with my debit card.","Zapłacę kartą debetową."],["Do you have a savings account?","Czy masz konto oszczędnościowe?"],["I’d like to open a bank account.","Chciałbym/Chciałabym otworzyć konto bankowe."],["How much interest do we earn?","Ile zarabiamy na odsetkach?"],["I need to withdraw some cash.","Muszę wypłacić gotówkę."],["Let’s set a financial goal.","Ustalmy cel finansowy."],["Are there any hidden fees?","Czy są jakieś ukryte opłaty?"],["We need to pay off our debt.","Musimy spłacić nasz dług."],["How much is left in the account?","Ile zostało na koncie?"],["Can we split the bill?","Czy możemy podzielić rachunek?"],["I transferred the payment.","Przelałem/przelałam płatność."],["Do you have cash or card?","Masz gotówkę czy kartę?"],["I’m trying to save for a vacation.","Próbuję zaoszczędzić na wakacje."],["This is within our budget.","To mieści się w naszym budżecie."],["Can you help me with the finances?","Czy możesz mi pomóc z finansami?"],["I want to invest in stocks.","Chcę zainwestować w akcje."],["We’re setting aside money for emergencies.","Odkładamy pieniądze na nagłe wypadki."]]}]},{"id":"people","name":"People, Feelings & Free Time","pl":"Ludzie","topics":[{"id":"family","title":"Family Members","eps":[14],"words":[["aunt","ciocia"],["dad","tata"],["father","ojciec"],["birth father","ojciec biologiczny"],["brother-in-law","szwagier"],["child","dziecko"],["daughter","córka"],["daughter-in-law","synowa"],["elder sister","starsza siostra"],["father-in-law","teść"],["brother","brat"],["grandchildren","wnuki"],["grandfather","dziadek"],["grandmother","babcia"],["grandson","wnuk"],["great-grandmother","prababcia"],["great-grandfather","pradziadek"],["half-brother","brat przyrodni"],["half-sister","siostra przyrodnia"],["mother","matka"],["mother-in-law","teściowa"],["mom","mama"],["nephew","siostrzeniec"],["niece","siostrzenica"],["parents","rodzice"],["siblings","rodzeństwo"],["sister","siostra"],["sister-in-law","bratowa"],["son","syn"],["son-in-law","zięć"],["step-father","ojczym"],["step-mother","macocha"],["uncle","wujek"]],"phrases":[]},{"id":"occasions","title":"Family Occasions","eps":[15],"words":[],"phrases":[["birthday","urodziny"],["name day","imieniny"],["anniversary","rocznica"],["party","przyjęcie"],["birthday party","przyjęcie urodzinowe"],["best wishes","najlepsze życzenia"],["birthday boy","solenizant"],["birthday girl","solenizantka"],["birthday cake","tort urodzinowy"],["birthday wishes","życzenia urodzinowe"],["birthday present","prezent urodzinowy"],["celebrate (birthday)","obchodzić (urodziny)"],["celebrate (anniversary)","świętować rocznicę"],["family gathering","spotkanie rodzinne"],["family reunion","zjazd rodzinny"],["wishes","życzenia"]]},{"id":"emotions","title":"Emotions","eps":[18,19],"words":[["dislike","antypatia"],["apathy","apatia"],["depression","depresja"],["enthusiasm","entuzjazm"],["mood","humor"],["irritation","irytacja"],["love","miłość"],["hope","nadzieja"],["hatred","nienawiść"],["dissatisfaction","niezadowolenie"],["indifference","obojętność"],["excitement","podniecenie"],["admiration","podziw"],["contempt","pogarda"],["amusement","rozbawienie"],["disappointment","rozczarowanie"],["despair","rozpacz"],["loneliness","samotność"],["sadness","smutek"],["respect","szacunek"],["happiness","szczęście"],["relief","ulga"],["gratitude","wdzięczność"],["belief","wiara"],["hostility","wrogość"],["sypmathy","współczucie"],["shame","wstyd"],["fury","wściekłość"],["satisfaction","zadowolenie"],["embarrassment","zakłopotanie"],["jealousy","zazdrość"],["anger","złość"],["worry","zmartwienie"]],"phrases":[["His patience wore thin","Jego cierpliwość jest na wyczerpaniu"],["you owe me an apology","Jesteś mi winny przeprosiny"],["Feelings ran high","Emocje rozgorzały"],["She said she hated him","Mówiła, że go nienawidzi"],["I got angry","Zdenerwowałem się"],["The others argued","Reszta się kłóciła"],["I measured him up and down","Zmierzyłem go wzrokiem"],["There is nothing to fear","Nie ma się czego bać"],["I am not scared of you","Nie boję się Ciebie"],["She is terrified of spiders","Strasznie się boi pająków"],["I am not sure","Nie jestem pewny"],["His hair stood on end","Włosy stanęły mu dęba"],["She was shaking in fright","Drżała ze strachu"],["I hurt her feeligs","Zraniłem jej uczucia"],["I fell in love with her","Zakochałem się w niej"],["They loved each other very much","Bardzo się kochali"],["He remained the love of her life","Pozostał miłością jej życia"],["We understood each other perfectly","Rozumiemy się doskonale"],["They don't trust us","Nie mają do nas zaufania"]]},{"id":"social","title":"Social Life","eps":[38,39],"words":[["friend","przyjaciel"],["acquaintance","znajomy"],["party","impreza"],["meeting","spotkanie"],["invite","zaprosić"],["relatives","krewni"],["intimate","intymny"],["brag","chwalić się"],["conversation","rozmowa"],["message","wiadomość"],["silence","cisza"],["club","klub"],["dancing","taniec"],["theater","teatr"],["church","kościół"],["single","singiel"],["relationship","związek"],["marriage","małżeństwo"],["plans","plany"],["date","randka"],["event","wydarzenie"],["concert","koncert"],["team","drużyna"],["guests","goście"],["stranger","nieznajomy"],["friendship","przyjaźń"],["love","miłość"],["call","dzwonić"],["message","wysyłać wiadomość"],["trip","wycieczka"]],"phrases":[["Are you doing anything tonight?","Czy robisz coś wieczorem?"],["I'm busy","Jestem zajęty"],["We're meeting at eight","Spotykamy się o ósmej"],["Did you get the invite?","Czy dostałeś zaproszenie?"],["Are you coming to the party?","Czy idziesz na przyjęcie?"],["We met at the bar","Spotkaliśmy się w barze"],["Don't interrupt me","Nie przerywaj mi"],["This is my friend Jane","To moja koleżanka Jane"],["What time are you free?","O której jesteś wolny?"],["I have guests over","Mam w domu gości"],["Go downtown","Iść do centrum"],["I'll pick you up at four","Odbiorę Cię o czwartej"],["He is very funny","On jest bardzo zabawny"],["I don't like spending time with him","Nie lubię spędzać z nim czasu"],["Meet my friends","Poznaj moich przyjaciół"],["What's the plan for tonight?","Jaki jest plan na wieczór?"],["Someone is calling me","Ktoś do mnie dzwoni"],["She is coming with us","Ona idzie z nami"],["What movie do you want to see?","Jaki film chcesz zobaczyć?"],["Can I talk to you?","Czy mogę z Tobą porozmawiać?"]]},{"id":"gossip","title":"Gossip","eps":[40,41],"words":[["hearsay","pogłoski"],["heated exchange","burzliwa wymiana zdań"],["malicious","złośliwy"],["word of mouth","przekaz ustny"],["unconfirmed","niepotwierdzony"],["giggle","hichotać"],["whisper","szeptać"],["yell","krzyczeć"],["fight","kłótnia"],["spread","poszerzać"],["post","publikować"],["huddle","gromada"],["sneak","skradać się"],["hateful","nienawistny"],["pass on","przekazywać"],["eavesdrop","podsłuchiwać"],["overhear","przypadkowo usłyszeć"],["affair","romans"],["response","odpowiedź"],["fabricate","zmyślać"],["brag","chwalić się"],["exaggerate","wyolbrzymiać"],["underestimate","nie doceniać"]],"phrases":[["Did you see what he did?","Czy widziałaś co zrobił?"],["She is the worst","Ona jest najgorsza"],["You don't want to talk about him","Nie chcę o nim rozmawiać"],["What have you heard?","Co słyszałeś?"],["What do you think about this?","Co o tym myślisz?"],["Don't tell anyone","Nie mów nikomu"],["I have urgent news","Mam pilną wiadomość"],["I heard about this from Anna","Usłyszałem o tym od Anny"],["I don't think that's true","Nie wydaje mi się, że to prawda"],["Don't lie to me","Nie kłam"],["I'm shocked","Jestem zaskoczona"],["I shouldn't tell you this","Nie powinienem Ci o tym mówić"],["That's horrible","To jest okropne"],["Why did he do that?","Dlaczego to zrobił?"],["Whisper it into my ear","Wyszeptaj mi na ucho"],["Quiet, they will hear you","Ciszej, usłyszą Cię"],["Tell me your biggest secret","Powiedz mi Twój największy sekret"],["We shouldn't eavesdrop","Nie powinniśmy podsłuchiwać"],["I can't hear what you're saying","Nie słyszę co mówisz"],["Who told you that?","Kto Ci o tym powiedział?"],["He began to read","Zaczął czytać"],["He finished writing","Skończył pisać"],["He rarely goes outside","Rzadko wychodzi na zewnątrz"],["He waited for a long time","Długo czekał"],["He went for a long walk","Poszedł na długi spacer"],["He went to the window","Podszedł do okna"],["His wife heard and came downstairs","Jego żona usłyszała i zeszła na dół"],["He leaned out of the window","On wychylił się z okna"],["He looked out of the window","On wyjrzał przez okno"],["She went outside","Ona wyszła na zewnątrz"],["She got back into bed","Ona wróciła do łóżka"],["She got out of bed","Ona wstała z łóżka"],["She took care of her siblings","Opiekowała się rodzeństwem"],["She went over to the window","Podeszła w stronę okna"],["We must walk home","Musimy iść do domu"],["You can't sit and do nothing","Nie możesz siedzieć i nic nie robić"]]},{"id":"love","title":"Love","eps":[60,61],"words":[["Love","Miłość"],["Affection","Uczucie"],["Romance","Romans"],["Heart","Serce"],["Kiss","Pocałunek"],["Hug","Uścisk"],["Passion","Pasja"],["Admiration","Podziw"],["Date","Randka"],["Relationship","Związek"],["Engagement","Zaręczyny"],["Marriage","Małżeństwo"],["Fiancé","Narzeczony/Narzeczona"],["Partner","Partner/Partnerka"],["Attraction","Pociąganie"],["Crush","Zauroczenie"],["True love","Prawdziwa miłość"],["Forever","Na zawsze"],["Together","Razem"],["Gift","Prezent"],["Valentine’s Day","Walentynki"],["Promise","Obietnica"],["To fall in love","Zakochać się"],["Soulmate","Bratnia dusza"],["I love you","Kocham cię"]],"phrases":[["I love you.","Kocham cię."],["I have feelings for you.","Mam do ciebie uczucia."],["You mean a lot to me.","Dużo dla mnie znaczysz."],["Will you go out with me?","Czy pójdziesz ze mną na randkę?"],["I think I’m falling in love with you.","Chyba się w tobie zakochuję."],["You’re my soulmate.","Jesteś moją bratnią duszą."],["I miss you.","Tęsknię za tobą."],["You have a beautiful smile.","Masz piękny uśmiech."],["Can I hold your hand?","Czy mogę trzymać cię za rękę?"],["I can’t stop thinking about you.","Nie mogę przestać o tobie myśleć."],["You make me happy.","Sprawiasz, że jestem szczęśliwy/szczęśliwa."],["Will you be my Valentine?","Czy będziesz moją walentynką?"],["I feel safe with you.","Czuję się przy tobie bezpiecznie."],["I want to be with you.","Chcę być z tobą."],["You’re my one and only.","Jesteś moim jedynym/moją jedyną."],["Thank you for being in my life.","Dziękuję, że jesteś w moim życiu."],["I admire you.","Podziwiam cię."],["You’re perfect for me.","Jesteś dla mnie idealny/idealna."],["I love spending time with you.","Uwielbiam spędzać z tobą czas."],["I want to make you happy.","Chcę cię uszczęśliwić."],["Can I kiss you?","Czy mogę cię pocałować?"],["You stole my heart.","Skradłeś/Skradłaś moje serce."],["Let’s be together forever.","Bądźmy razem na zawsze."],["I’ll always be here for you.","Zawsze będę przy tobie."],["You are my everything.","Jesteś moim wszystkim."]]},{"id":"leisure","title":"Entertainment & Leisure","eps":[50,51],"words":[["Movie","Film"],["Cinema","Kino"],["Concert","Koncert"],["Theater","Teatr"],["Music","Muzyka"],["Song","Piosenka"],["Book","Książka"],["Television","Telewizja"],["Hobby","Hobby"],["Game","Gra"],["Sports","Sporty"],["Art","Sztuka"],["Museum","Muzeum"],["Gallery","Galeria"],["Photography","Fotografia"],["Dancing","Taniec"],["Vacation","Wakacje"],["Party","Impreza"],["Event","Wydarzenie"],["Exhibition","Wystawa"],["Festival","Festiwal"],["Picnic","Piknik"],["Gym","Siłownia"],["Swimming pool","Basen"],["Park","Park"]],"phrases":[["What are you doing this weekend?","Co robisz w ten weekend?"],["I’m going to the cinema.","Idę do kina."],["Let’s go to a concert!","Chodźmy na koncert!"],["Do you like to watch movies?","Czy lubisz oglądać filmy?"],["I love reading books.","Uwielbiam czytać książki."],["I’m interested in photography.","Interesuję się fotografią."],["Would you like to go to the theater?","Czy chciałbyś/chciałabyś pójść do teatru?"],["What’s your favorite hobby?","Jakie jest twoje ulubione hobby?"],["I enjoy playing sports.","Lubię uprawiać sport."],["Do you want to come to the party?","Chcesz przyjść na imprezę?"],["I’m going to a music festival next month.","Idę na festiwal muzyczny w przyszłym miesiącu."],["What kind of music do you listen to?","Jakiej muzyki słuchasz?"],["Have you seen this movie?","Czy widziałeś/widziałaś ten film?"],["I’m going to an art exhibition.","Idę na wystawę sztuki."],["Let’s go for a walk in the park.","Chodźmy na spacer do parku."],["Do you want to play a board game?","Chcesz zagrać w planszówkę?"],["I’m going swimming at the pool.","Idę popływać na basenie."],["I like going to the gym.","Lubię chodzić na siłownię."],["Can we meet at the museum?","Czy możemy spotkać się w muzeum?"],["I prefer staying in and watching TV.","Wolę zostać w domu i oglądać telewizję."],["Let’s have a picnic this afternoon.","Zróbmy piknik dziś po południu."],["What time does the concert start?","O której zaczyna się koncert?"],["Are you free this evening?","Czy jesteś wolny/wolna dzisiaj wieczorem?"],["I’m planning a vacation next month.","Planuję wakacje w przyszłym miesiącu."],["Do you want to hang out this weekend?","Czy chcesz się spotkać w ten weekend?"]]}]},{"id":"work","name":"Work & School","pl":"Praca i nauka","topics":[{"id":"work","title":"Work","eps":[22,23],"words":[["work","praca"],["earn","zarabiać"],["income","dochód"],["pay raise","podwyżka"],["retirement","emerytura"],["salary","pensja"],["bonus","premia"],["unemployment","bezrobocie"],["wage","tygodniówka"],["achievement","osiągnięcie"],["full-time","pełen etat"],["badly paid","Źle płatna"],["well paid","Dobrze płatna"],["dangerous","niebezpieczna"],["stressful","stresująca"],["boring","nudna"],["satisfying","satysfakcjonująca"],["important","ważna"],["demanding","wymagająca"],["career","kariera"],["application","podanie"],["fired","zwolniony"],["colleague","kolega z pracy"],["cover letter","list motywacyjny"],["custom made","wykonane na zamówienie"],["deadline","termin"],["experience","doświadczenie"],["freelancer","wolny strzelec"],["promotion","awans"],["graduate","absolwent"],["overtime","nadgodziny"],["job interview","rozmowa kwalifikacyjna"],["profession","zawód"],["position","stanowisko"],["serve","obsługiwać"],["skilled","wykwalifikowany"],["shift","zmiana"],["staff","personel"],["unemployed","bezrobotny"],["turn down","odrzucić"]],"phrases":[["Give up on a job","Rzucić pracę"],["Do something for a living","Zarabiać na życie"],["Detail oriented","Uważny na szczegóły"],["Bury yourself in your work","Skupić się na pracy"],["I’m going out to lunch","Wychodzę na obiad"],["How do you get to work","Czym dojeżdżasz do pracy"],["Out sick","Nieobecny z powodu choroby"],["On vacation","Być na urlopie"],["Sorry to keep you waiting","Przepraszam, że musiał Pan czekać"],["Can I help you?","Czy mogę Panu pomóc?"],["Is this a temporary or permanent position?","Czy to jest praca tymczasowa, czy stała?"],["What are the hours of work?","Jakie są godziny pracy?"],["How much does the job pay?","Jakie jest wynagrodzenie?"],["What is the salary?","Jaka jest miesięczna wypłata?"],["Who do I report to?","Kto jest moim przełożonym?"],["When do I start?","Kiedy mogę zacząć?"],["Do you have any experience?","Jakie ma Pan doświadczenie?"],["Do you have a driver’s license?","Czy ma Pan prawo jazdy?"],["How long is the trial period?","Ile trwa okres próbny?"],["This is your employment contract","To jest Pana umowa o pracę"]]},{"id":"school","title":"School","eps":[26,27],"words":[["to attend classes","chodzić na zajęcia"],["board","tablica"],["break","przerwa"],["cheat sheet","ściąga"],["classroom","sala lekcyjna"],["to collect homework","zebrać zadanie domowe"],["essay","wypracowanie"],["demanding","wymagający"],["to do well in school","dobrze się uczyć"],["entrance examination","egzamin wstępny"],["homeroom teacher","wychowawca klasy"],["good grades","dobre oceny"],["grade","ocena"],["group work","praca w grupach"],["homework","zadanie domowe"],["to learn","uczyć się"],["lesson","lekcja"],["low grades","słabe oceny"],["to grade","oceniać"],["to miss classes","opuszczać lekcje"],["to plany truant","chodzić na wagary"],["primary school","szkoła podstawowa"],["student","uczeń"],["raise one's hand","zgłaszać się"],["to repeat a year","powtarzać rok"],["school report","świadectwo szkolne"],["secondary school","szkoła średnia"],["subject of a lesson","temat lekcji"],["to take tests","pisać testy"],["to teach","uczyć"],["teacher","nauczyciel"],["teaching aids","pomoce naukowe"],["vocational school","szkoła zawodowa"]],"phrases":[["The teacher explained the theory","Nauczyciel wyjaśnił teorię"],["His grade was lowered","Obniżono mu ocenę"],["I learn foreign languages","Uczę się języków obcych"],["She is doing well in school","W szkole dobrze jej idzie"],["She went to school","Poszła do szkoły"],["He is good at math","est dobry z matematyki"],["She attends English courses","Chodzi na lekcje angielskiego"],["He did not like classes","Nie lubił lekcji"],["What is the best way to learn?","Jak najlepiej się uczyć?"],["She finished hight school","Skończyła szkołę średnią"],["She learned French quickly","Szybko nauczyła się języka francuskiego"],["They don't want to go to school","Nie chcą iść do szkoły"],["When I got back from school","Kiedy wróciłem ze szkoły"],["We attend the same school","Chodzimy do tej samej szkoły"],["There was no school today","Dzisiaj nie było lekcji"]]},{"id":"uni","title":"University & School","eps":[36,37],"words":[["school","szkołą"],["classroom","klasa"],["lesson","lekcja"],["pen","długopis"],["notebook","zeszyt"],["board","tablica"],["homework","praca domowa"],["exam","egzamin"],["term","semestr"],["textbook","podręcznik"],["market","marker"],["spelling","ortografia"],["teach","uczyć"],["teacher","nauczyciel"],["student","uczeń"],["grade","ocena"],["test","sprawdzian"],["holiday","święto"],["library","biblioteka"],["locker","szafka"],["lab","labolatorium"],["degree","dyplom"],["thesis","praca naukowa"],["lecture","wykład"],["pass","zdać"],["fail","nie zdać"],["subject","przedmiot"],["results","wyniki"],["question","pytanie"],["notes","notatki"],["classmates","kolega z klasy"]],"phrases":[["What classes are you taking?","Jakie masz przedmioty?"],["When do you school?","Kiedy zaczynasz szkołę?"],["How did your test go?","Jak Ci poszedł test?"],["What is your grade average?","Jaką masz średnią ocen?"],["I just got out of class","Właśnie wyszedłem z zajęć"],["Did you finish your essay?","Czy skończyłeś wypracowanie?"],["What are you studying?","Czego się uczysz?"],["I got a tutor","Mam korepetytora"],["I need more practice","Potrzebuję więcej ćwiczyć"],["Did you know understand the task?","Czy zrozumiałeś zadanie?"],["Do you know the answer?","Czy znasz odpowiedź?"],["What are your plans after school?","Jakie masz plany po szkole?"],["Who can solve this problem?","Kto potrafi rozwiązać ten problem?"],["I need to retake the exam","Muszę powtórzyć egzamin"],["Can I look at your notes?","Czy mogę zobaczyć Twoje notatki?"],["Could I borrow your book?","Czy mógłbym pożyczyć Twoją książkę?"],["I'll be tardy for class","Spóźnię się na zajęcia"],["This is my favorite subject","To jest mój ulubiony przedmiot"],["My pencil broke","Złamał mi się ołówek"],["I got the scholarship","Dostałem stypendium"]]},{"id":"email","title":"E-mailing","eps":[108,109],"words":[["Email","Email"],["Inbox","Skrzynka odbiorcza"],["Subject","Temat"],["Recipient","Odbiorca"],["Sender","Nadawca"],["Attachment","Załącznik"],["Draft","Szkic"],["Reply","Odpowiedź"],["Forward","Przekazać"],["BCC (Blind Carbon Copy)","UDW (Ukryte Do Wiadomości)"],["CC (Carbon Copy)","DW (Do Wiadomości)"],["Spam","Spam"],["Junk mail","Niechciana poczta"],["Greeting","Powitanie"],["Closing","Zakończenie"],["Signature","Podpis"],["Delete","Usunąć"],["Archive","Archiwizować"],["Sent items","Wysłane wiadomości"],["Unread","Nieprzeczytane"],["Reply all","Odpowiedz wszystkim"],["Priority","Priorytet"],["Notification","Powiadomienie"],["Save","Zapisać"],["Template","Szablon"]],"phrases":[["Dear Sir/Madam,","Szanowny Panie/Szanowna Pani,"],["To whom it may concern,","Do kogo to może dotyczyć,"],["Hello [Name],","Witaj [Imię],"],["I hope this email finds you well.","Mam nadzieję, że ten email zastaje Cię w dobrym zdrowiu."],["I am writing to you regarding…","Piszę do Ciebie w sprawie…"],["Thank you for your email.","Dziękuję za Twój email."],["Please find the attachment below.","Proszę znaleźć załącznik poniżej."],["I would like to confirm…","Chciałbym/Chciałabym potwierdzić…"],["Could you please provide more details?","Czy możesz podać więcej szczegółów?"],["I look forward to hearing from you.","Czekam na Twoją odpowiedź."],["If you have any questions, don’t hesitate to ask.","Jeśli masz jakieś pytania, nie wahaj się pytać."],["Best regards,","Z poważaniem,"],["Kind regards,","Pozdrawiam serdecznie,"],["Sincerely,","Z wyrazami szacunku,"],["Thank you for your time.","Dziękuję za Twój czas."],["I apologize for the delay in response.","Przepraszam za opóźnienie w odpowiedzi."],["Let me know if this works for you.","Daj znać, czy to Ci odpowiada."],["I am attaching the requested document.","Załączam wymagany dokument."],["Could you clarify this point?","Czy możesz wyjaśnić ten punkt?"],["Please let me know if there’s anything else I can help with.","Proszę daj znać, jeśli mogę jeszcze w czymś pomóc."],["This email is to follow up on our previous conversation.","Ten email jest kontynuacją naszej wcześniejszej rozmowy."],["Thank you for your quick reply.","Dziękuję za szybką odpowiedź."],["Could you share your availability for a meeting?","Czy możesz podać swoją dostępność na spotkanie?"],["Let’s schedule a time to discuss this further.","Ustalmy termin, aby omówić to dalej."],["Thank you in advance for your assistance.","Z góry dziękuję za Twoją pomoc."]]}]},{"id":"health","name":"Health & Emergencies","pl":"Zdrowie","topics":[{"id":"ill","title":"Illnesses & Injuries","eps":[28,29],"words":[["sick","chory"],["bleeding","krwawienie"],["allergy","alergia"],["headache","ból głowy"],["bruise pain","siniak"],["cold","ból"],["cramp","przeziębienie"],["cough","skurcz"],["cut","kaszel"],["diarrhoea","przecięcie"],["disease","biegunka"],["dizziness","choroba"],["fatigue","zawroty głowy"],["heal","zmęczenie"],["infection","goić się"],["injury","zakażenie"],["nosebleed","uraz ciała"],["obese","krwawienie z nosa"],["rash","otyły"],["sore","wysypka"],["throat","ból gardła"],["sprain","zwichnięcie"],["sunburn","oparzenie słoneczne"],["swelling","opuchlizna"],["virus","wirus"],["medicine","lekarstwo"],["doctor","lekarz"],["prescription","recepta"],["nurse","pielęgniarka"],["patient","pacjent"],["hospital","szpital"],["operation","operacja"],["appointment","wizyta"],["insurance","ubezpieczenie"],["blood","krew"],["temperature","temperatura"],["blind","niewidomy"],["deaf","głuchy"],["bandage","bandaż"]],"phrases":[["What's the matter?","Co Panu dolega?"],["I'm not feeling well","Źle się czuje"],["I have a headache","Boli mnie głowa"],["I've got the flu","Mam grypę"],["I have pain in my neck","Czuje ból w szyi"],["I cut my finger","Skaleczyłem się w palec"],["Get well soon","Szybkiego powrotu do zdrowia"],["Do you have any painkillers?","Czy masz tabletki przeciwbólowe?"],["How are you feeling?","Jak się czujesz?"],["I need to see the doctor","Muszę pójść do lekarza"],["Do you know a good doctor?","Czy znasz dobrego lekarza?"],["Do you feel any pain?","Czy coś Cię boli?"],["He broke his leg","Złamał nogę"],["Do you have an appointment?","Czy był Pan umówiony na wizytę?"],["What are your symptoms?","Jakie ma Pan objawy?"],["I can't breathe","Nie mogę oddychać"],["Do you have any allergies?","Czy masz jakieś alergie?"],["I have a sick note","Mam zwolnienie lekarskie"],["You need to rest","Musisz odpocząć"],["I have a runny nose","Mam katar"],["I'm going to throw up","Zaraz zwymiotuję"],["Put a bandage on it","Owiń to bandażem"],["Do you get sick often?","Czy często chorujesz?"]]},{"id":"medical","title":"Health & Medical","eps":[48,49],"words":[["Doctor","Lekarz"],["Nurse","Pielęgniarka"],["Patient","Pacjent"],["Hospital","Szpital"],["Pharmacy","Apteka"],["Prescription","Recepta"],["Appointment","Wizyta"],["Medicine","Lekarstwo"],["Headache","Ból głowy"],["Fever","Gorączka"],["Cold","Przeziębienie"],["Cough","Kaszel"],["Stomachache","Ból brzucha"],["Sore throat","Ból gardła"],["Allergy","Alergia"],["Injury","Uraz"],["Bandage","Bandaż"],["Pain","Ból"],["Flu","Grypa"],["Blood pressure","Ciśnienie krwi"],["Vaccine","Szczepionka"],["X-ray","Rentgen"],["Cast","Gips"],["Ambulance","Karetka"],["Emergency","Nagły wypadek"]],"phrases":[["I have an appointment with the doctor.","Mam wizytę u lekarza."],["What are your symptoms?","Jakie są twoje objawy?"],["I have a headache.","Mam ból głowy."],["I don’t feel well.","Źle się czuję."],["Do you have any allergies?","Czy masz jakieś alergie?"],["I need to see a doctor.","Muszę zobaczyć się z lekarzem."],["Is there a pharmacy nearby?","Czy w pobliżu jest apteka?"],["Can I get a prescription?","Czy mogę dostać receptę?"],["How long have you had these symptoms?","Jak długo masz te objawy?"],["I have a fever.","Mam gorączkę."],["I’d like to make an appointment.","Chciałbym/Chciałabym umówić wizytę."],["Do I need a prescription for this medicine?","Czy potrzebuję recepty na to lekarstwo?"],["I’m allergic to penicillin.","Jestem uczulony/uczulona na penicylinę."],["Is this medicine available without a prescription?","Czy to lekarstwo jest dostępne bez recepty?"],["I have a sore throat.","Boli mnie gardło."],["Where is the nearest hospital?","Gdzie jest najbliższy szpital?"],["I’ve been feeling sick for two days.","Źle się czuję od dwóch dni."],["I need something for a cough.","Potrzebuję czegoś na kaszel."],["My stomach hurts.","Boli mnie brzuch."],["Do I need to take this medicine with food?","Czy muszę brać to lekarstwo z jedzeniem?"],["Can I take this medicine if I’m pregnant?","Czy mogę brać to lekarstwo, jeśli jestem w ciąży?"],["How much does this cost?","Ile to kosztuje?"],["Call an ambulance!","Zadzwoń po karetkę!"],["I need to go to the emergency room.","Muszę jechać na pogotowie."],["Is this covered by insurance?","Czy to jest objęte ubezpieczeniem?"]]},{"id":"emergency","title":"Emergency","eps":[63,64],"words":[["Help!","Pomocy!"],["Emergency","Nagły wypadek"],["Ambulance","Karetka"],["Fire","Pożar"],["Police","Policja"],["Accident","Wypadek"],["Injury","Uraz"],["First aid","Pierwsza pomoc"],["Doctor","Lekarz"],["Hospital","Szpital"],["Medicines","Leki"],["Burn","Oparzenie"],["Fracture","Złamanie"],["Bleeding","Krwawienie"],["Conscious","Przytomny/przytomna"],["Unconscious","Nieprzytomny/nieprzytomna"],["Poisoning","Zatrucie"],["Heart attack","Zawał serca"],["Stroke","Udar"],["Breathing","Oddychanie"],["Choking","Zadławienie"],["Emergency room","Izba przyjęć"],["Rescue","Ratunek"],["Fire extinguisher","Gaśnica"],["Safe/Safety","Bezpieczny/bezpieczeństwo"]],"phrases":[["Call an ambulance!","Zadzwoń po karetkę!"],["I need help!","Potrzebuję pomocy!"],["There has been an accident.","Wydarzył się wypadek."],["Please call the police.","Proszę wezwać policję."],["I don’t feel well.","Źle się czuję."],["I think I’m hurt.","Chyba jestem ranny/ranna."],["Where is the nearest hospital?","Gdzie jest najbliższy szpital?"],["I need a doctor.","Potrzebuję lekarza."],["Someone is unconscious.","Ktoś jest nieprzytomny."],["Can you help me, please?","Czy możesz mi pomóc, proszę?"],["I’m allergic to…","Mam alergię na…"],["I’ve been poisoned.","Zostałem/Zostałam zatruty/zatruta."],["I have severe pain.","Mam silny ból."],["My chest hurts.","Boli mnie klatka piersiowa."],["I can’t breathe.","Nie mogę oddychać."],["I feel dizzy.","Mam zawroty głowy."],["I’ve had an accident.","Miałem/Miałam wypadek."],["Please hurry!","Proszę się pospieszyć!"],["I need medication.","Potrzebuję lekarstw."],["I think I broke my arm/leg.","Chyba złamałem/złamałam rękę/nogę."],["There’s a fire!","Jest pożar!"],["Do you have a first aid kit?","Czy masz apteczkę?"],["Is it safe here?","Czy tutaj jest bezpiecznie?"],["Where can I find the emergency room?","Gdzie mogę znaleźć izbę przyjęć?"],["I’ve lost consciousness","Straciłem/Straciłam przytomność."]]}]},{"id":"seasons","name":"Weather, Seasons & Holidays","pl":"Pory roku","topics":[{"id":"weather","title":"Weather","eps":[24,25],"words":[["adverse weather","Niesprzyjająca pogoda"],["sun","słońce"],["sunshine","Promienie słoneczne"],["rain","Deszcz"],["snow","Śnieg"],["hail","Grad"],["drizzle","mżawka"],["sleet","Deszcz ze śniegiem"],["shower","Przelotny deszcz"],["fog","mgła"],["cloud","Chmura"],["rainbow","tęcza"],["wind","Wiatr"],["thunder","Grzmot"],["lightning","Piorun"],["storm","Burza"],["tornado","Tornado"],["hurricane","Huragan"],["flood","powódź"],["frost","mróz"],["ice","lód"],["drought","Susza"],["cloudy","Pochmurnie"],["wet","mokro"],["dry","sucho"],["hot","Gorąco"],["cold","zimno"],["humid","wilgotno"],["temperature","temperatura"],["degree","stopień"],["climate","klimat"],["Celsius","Celcjusz"],["Fahrenheit","Farenheit"]],"phrases":[["What’s the weather like?","Jaka jest pogoda?"],["What a nice day","Jaki ładny dzień"],["It’s starting to rain","Zaczyna padać"],["It’s overcast","Niebo jest zachmurzone"],["It’s clearing up","Przejaśnia się"],["The sun’s coming up","Wychodzi słońce"],["There’s a strong wind","Jest silny wiatr"],["A storm is coming","Nadchodzi burza"],["What is the temperature?","Jaka jest temperatura?"],["It’s 10 degrees outside","Temperatura wynosi 10 stopni"],["It’s below zero","Jest poniżej zera"],["What’s the forecast?","Jaka jest prognoza?"],["The weather will clear up soon","Za niedługo się przejaśni"],["It looks like it’s going to rain","Wygląda że będzie padać"]]},{"id":"weather2","title":"More Weather","eps":[99,100],"words":[["Weather","Pogoda"],["Forecast","Prognoza"],["Rain","Deszcz"],["Sun","Słońce"],["Cloud","Chmura"],["Snow","Śnieg"],["Wind","Wiatr"],["Storm","Burza"],["Lightning","Błyskawica"],["Thunder","Grzmot"],["Fog","Mgła"],["Clear","Bezchmurnie"],["Cold","Zimno"],["Hot","Gorąco"],["Warm","Ciepło"],["Cool","Chłodno"],["Temperature","Temperatura"],["Humidity","Wilgotność"],["Breeze","Bryza"],["Drizzle","Mżawka"],["Frost","Mróz"],["Hail","Grad"],["Rainbow","Tęcza"],["Overcast","Pochmurno"],["Seasons","Pory roku"]],"phrases":[["What’s the weather like today?","Jaka jest dzisiaj pogoda?"],["It’s sunny outside.","Na dworze jest słonecznie."],["It’s going to rain.","Będzie padać deszcz."],["Is it cold outside?","Czy na dworze jest zimno?"],["It’s very windy today.","Dziś jest bardzo wietrznie."],["The sky is clear.","Niebo jest bezchmurne."],["It’s snowing.","Pada śnieg."],["It’s warm and pleasant.","Jest ciepło i przyjemnie."],["I heard there’s a storm coming.","Słyszałem/Słyszałam, że nadchodzi burza."],["The temperature is dropping.","Temperatura spada."],["It’s foggy this morning.","Dziś rano jest mgliście."],["Do you know the forecast for tomorrow?","Czy znasz prognozę na jutro?"],["It’s overcast, but not raining.","Jest pochmurno, ale nie pada."],["There’s a rainbow after the rain.","Po deszczu jest tęcza."],["It’s drizzling.","Mży."],["The humidity is high today.","Dziś jest wysoka wilgotność."],["I love when it’s breezy outside.","Uwielbiam, gdy na dworze jest lekki wiaterek."],["The storm was intense last night.","Wczoraj w nocy burza była intensywna."],["Will it be warm tomorrow?","Czy jutro będzie ciepło?"],["It’s chilly, you’ll need a jacket.","Jest chłodno, będziesz potrzebować kurtki."],["Let’s check the weather app.","Sprawdźmy aplikację pogodową."],["It’s frosty in the mornings now.","Rano jest teraz mroźno."],["The hail damaged my car.","Grad uszkodził mój samochód."],["Do you think it will snow for Christmas?","Myślisz, że będzie śnieg na Boże Narodzenie?"],["What a beautiful day!","Jaki piękny dzień!"]]},{"id":"spring","title":"Spring","eps":[66,67],"words":[["Spring","Wiosna"],["Flower","Kwiat"],["Bloom","Kwitnienie"],["Tree","Drzewo"],["Grass","Trawa"],["Sunshine","Promienie słoneczne"],["Rain","Deszcz"],["Rainbow","Tęcza"],["Breeze","Bryza"],["Garden","Ogród"],["Butterfly","Motyl"],["Bee","Pszczoła"],["Bird","Ptak"],["Nest","Gniazdo"],["Umbrella","Parasol"],["Raincoat","Płaszcz przeciwdeszczowy"],["Puddle","Kałuża"],["Blossom","Kwiatostan"],["Green","Zielony"],["Allergy","Alergia"],["Spring cleaning","Wiosenne porządki"],["Warm","Ciepło"],["Fresh air","Świeże powietrze"],["Picnic","Piknik"],["Sunrise","Wschód słońca"]],"phrases":[["Spring is finally here!","Wiosna w końcu nadeszła!"],["The flowers are blooming.","Kwiaty kwitną."],["Let’s go for a walk in the park.","Chodźmy na spacer do parku."],["The birds are singing.","Ptaki śpiewają."],["It’s warm and sunny outside.","Na dworze jest ciepło i słonecznie."],["The weather is perfect for a picnic.","Pogoda jest idealna na piknik."],["Let’s do some spring cleaning.","Zróbmy wiosenne porządki."],["The trees are turning green.","Drzewa zaczynają się zielenić."],["Do you want to go to the garden?","Chcesz pójść do ogrodu?"],["I love the fresh air in spring.","Uwielbiam świeże powietrze na wiosnę."],["The days are getting longer.","Dni stają się coraz dłuższe."],["I have a lot of allergies in spring.","Mam dużo alergii na wiosnę."],["The rain makes everything grow.","Deszcz sprawia, że wszystko rośnie."],["Let’s plant some flowers.","Posadźmy kwiaty."],["It’s starting to get warmer.","Zaczyna robić się cieplej."],["Spring is my favorite season.","Wiosna to moja ulubiona pora roku."],["Look at the rainbow!","Spójrz na tęczę!"],["It’s a beautiful spring morning.","To piękny wiosenny poranek."],["Let’s enjoy the sunshine.","Cieszmy się słońcem."],["Do you want to have a barbecue?","Chcesz zrobić grilla?"],["Spring brings new beginnings.","Wiosna przynosi nowe początki."],["The grass is so green.","Trawa jest taka zielona."],["It’s raining, but it’s warm.","Pada deszcz, ale jest ciepło."],["Let’s go outside and enjoy the weather.","Wyjdźmy na dwór i cieszmy się pogodą."],["The scent of flowers is in the air.","W powietrzu unosi się zapach kwiatów."]]},{"id":"fall","title":"Fall","eps":[93,94],"words":[["Fall/Autumn","Jesień"],["Leaves","Liście"],["Tree","Drzewo"],["Rain","Deszcz"],["Wind","Wiatr"],["Fog","Mgła"],["Cool","Chłodno"],["Pumpkin","Dynia"],["Sweater","Sweter"],["Scarf","Szalik"],["Boots","Buty"],["Umbrella","Parasol"],["Harvest","Żniwa"],["Apple","Jabłko"],["Cider","Cydr"],["Mushroom","Grzyb"],["Forest","Las"],["Fireplace","Kominek"],["Cozy","Przytulny"],["Thanksgiving","Święto Dziękczynienia"],["Corn","Kukurydza"],["Hayride","Przejażdżka na wozie z sianem"],["Autumn colors","Jesienne kolory"],["Cloudy","Pochmurno"],["Chilly","Zimno"]],"phrases":[["The leaves are changing colors.","Liście zmieniają kolory."],["It’s getting colder.","Robi się coraz zimniej."],["I love the smell of autumn.","Uwielbiam zapach jesieni."],["The trees look so beautiful.","Drzewa wyglądają tak pięknie."],["Let’s go for a walk in the forest.","Chodźmy na spacer do lasu."],["Do you want to carve pumpkins?","Chcesz wydrążyć dynie?"],["I need to buy a new sweater.","Muszę kupić nowy sweter."],["It’s time to make pumpkin soup.","Czas zrobić zupę dyniową."],["The wind is very strong today.","Wiatr jest dziś bardzo silny."],["Let’s sit by the fireplace and relax.","Usiądźmy przy kominku i zrelaksujmy się."],["Do you like autumn?","Lubisz jesień?"],["The air feels so fresh in the fall.","Powietrze jest takie świeże jesienią."],["Can you help me rake the leaves?","Czy możesz mi pomóc zgrabiać liście?"],["It’s cloudy and chilly today.","Dziś jest pochmurno i zimno."],["I enjoy drinking hot cider in the fall.","Lubię pić gorący cydr jesienią."],["Let’s go apple picking this weekend.","Pojedźmy na zbieranie jabłek w ten weekend."],["Do you want to join us for a hayride?","Chcesz dołączyć do nas na przejażdżkę na wozie z sianem?"],["The fog makes everything look mysterious.","Mgła sprawia, że wszystko wygląda tajemniczo."],["The kids love jumping into leaf piles.","Dzieci uwielbiają skakać w sterty liści."],["It’s the perfect weather for a picnic.","To idealna pogoda na piknik."],["I can’t wait to bake some apple pie.","Nie mogę się doczekać, żeby upiec szarlotkę."],["It’s sweater weather!","To pogoda na swetry!"],["Let’s decorate the house for fall.","Udekorujmy dom na jesień."],["The autumn evenings are so cozy.","Jesienne wieczory są takie przytulne."],["Thank you for this beautiful autumn day.","Dziękuję za ten piękny jesienny dzień."]]},{"id":"winter","title":"Winter","eps":[57,58],"words":[["Winter","Zima"],["Snow","Śnieg"],["Ice","Lód"],["Cold","Zimno"],["Freezing","Mroźno"],["Snowflake","Płatek śniegu"],["Snowman","Bałwan"],["Skiing","Narciarstwo"],["Snowboarding","Snowboard"],["Ice skating","Łyżwiarstwo"],["Sledding","Jazda na sankach"],["Hot chocolate","Gorąca czekolada"],["Scarf","Szalik"],["Gloves","Rękawiczki"],["Hat","Czapka"],["Coat","Płaszcz"],["Boots","Buty zimowe"],["Fireplace","Kominek"],["Icicle","Sopel"],["Blizzard","Zamieć"],["Snowstorm","Śnieżyca"],["Frost","Mróz"],["Winter break","Ferie zimowe"],["Cozy","Przytulny"],["Snowball","Śnieżka"]],"phrases":[["It’s very cold outside.","Na dworze jest bardzo zimno."],["It’s snowing.","Pada śnieg."],["Do you want to build a snowman?","Chcesz ulepić bałwana?"],["Let’s go ice skating.","Chodźmy na łyżwy."],["I love skiing in the winter.","Uwielbiam jeździć na nartach zimą."],["Would you like some hot chocolate?","Chciałbyś/Chciałabyś gorącą czekoladę?"],["The roads are icy.","Drogi są oblodzone."],["Let’s go sledding.","Chodźmy na sanki."],["I need to wear a scarf and gloves.","Muszę założyć szalik i rękawiczki."],["The snow is so beautiful.","Śnieg jest taki piękny."],["Let’s warm up by the fireplace.","Ogrzejmy się przy kominku."],["It’s freezing!","Jest mroźno!"],["I love cozy winter evenings.","Uwielbiam przytulne zimowe wieczory."],["Do you want to have a snowball fight?","Chcesz zrobić bitwę na śnieżki?"],["We’re going to the mountains for winter break.","Jedziemy w góry na ferie zimowe."],["The lake is frozen over.","Jezioro jest zamarznięte."],["Watch out for icicles.","Uważaj na sople."],["Let’s go to the winter market.","Chodźmy na jarmark zimowy."],["The wind makes it feel colder.","Wiatr sprawia, że jest zimniej."],["I need to buy a warmer coat.","Muszę kupić cieplejszy płaszcz."],["Winter is my favorite season.","Zima to moja ulubiona pora roku."],["The snow is very deep.","Śnieg jest bardzo głęboki."],["Let’s make a fire to keep warm.","Zróbmy ognisko, żeby się ogrzać."],["I can’t wait for winter activities.","Nie mogę się doczekać zimowych aktywności."],["Be careful, the ground is slippery.","Uważaj, ziemia jest śliska."]]},{"id":"wsports","title":"Winter Sports","eps":[105,106],"words":[["Winter sports","Sporty zimowe"],["Skiing","Narciarstwo"],["Snowboarding","Snowboarding"],["Ice skating","Łyżwiarstwo"],["Ski slope","Stok narciarski"],["Snow","Śnieg"],["Ice","Lód"],["Ski lift","Wyciąg narciarski"],["Ski boots","Buty narciarskie"],["Skis","Narty"],["Snowboard","Deska snowboardowa"],["Helmet","Kask"],["Goggles","Gogle"],["Poles","Kijki"],["Winter jacket","Kurtka zimowa"],["Gloves","Rękawiczki"],["Snowball fight","Walka na śnieżki"],["Sledding","Jazda na sankach"],["Ice hockey","Hokej na lodzie"],["Curling","Curling"],["Cross-country skiing","Narciarstwo biegowe"],["Avalanche","Lawina"],["Snowmobile","Skuter śnieżny"],["Figure skating","Łyżwiarstwo figurowe"],["Winter Olympics","Zimowe Igrzyska Olimpijskie"]],"phrases":[["Where can I rent skis?","Gdzie mogę wypożyczyć narty?"],["Do you have snowboard rentals?","Czy macie wypożyczalnię desek snowboardowych?"],["What size boots do you need?","Jaki rozmiar butów potrzebujesz?"],["How much is the ski pass?","Ile kosztuje karnet narciarski?"],["Where is the ski lift?","Gdzie jest wyciąg narciarski?"],["Is this slope suitable for beginners?","Czy ten stok jest odpowiedni dla początkujących?"],["What time does the slope open?","O której otwiera się stok?"],["Do I need to book lessons in advance?","Czy muszę zarezerwować lekcje z wyprzedzeniem?"],["Can you show me how to use the poles?","Czy możesz mi pokazać, jak używać kijków?"],["I’m a beginner skier.","Jestem początkującym narciarzem."],["Where is the closest sledding hill?","Gdzie jest najbliższa górka do zjeżdżania na sankach?"],["Can I join an ice skating lesson?","Czy mogę dołączyć do lekcji jazdy na łyżwach?"],["I need a helmet for snowboarding.","Potrzebuję kasku do snowboardu."],["Do you have any maps of the ski slopes?","Czy macie mapy stoków narciarskich?"],["Watch out for the ice!","Uważaj na lód!"],["How do I stop on skis?","Jak się zatrzymać na nartach?"],["Can you recommend a good ski instructor?","Czy możesz polecić dobrego instruktora narciarskiego?"],["Let’s take a break at the chalet.","Zróbmy przerwę w schronisku."],["How do I use this ski lift?","Jak używać tego wyciągu narciarskiego?"],["What’s the weather forecast for the slopes?","Jaka jest prognoza pogody dla stoków?"],["It’s too windy for skiing today.","Dziś jest za wietrznie na jazdę na nartach."],["Can I have a hot chocolate after skiing?","Czy mogę dostać gorącą czekoladę po nartach?"],["I fell but I’m okay!","Upadłem/Upadłam, ale wszystko w porządku!"],["How do I get to the cross-country ski trail?","Jak dojść do trasy biegowej?"],["Thank you for a great day on the slopes!","Dziękuję za wspaniały dzień na stoku!"]]},{"id":"christmas","title":"Christmas","eps":["48 (Christmas)","49 (Christmas)"],"words":[["Christmas","Boże Narodzenie"],["Christmas Eve","Wigilia"],["Santa Claus","Święty Mikołaj"],["Christmas tree","Choinka"],["Gift/Present","Prezent"],["Carols","Kolędy"],["Star","Gwiazda"],["Midnight Mass","Pasterka"],["Christmas dinner","Kolacja wigilijna"],["Ornaments","Ozdoby"],["Christmas Wafer","Opłatek"],["Snow","Śnieg"],["Christmas market","Jarmark bożonarodzeniowy"],["Gingerbread","Piernik"],["Candle","Świeca"],["Christmas Eve supper","Wieczerza wigilijna"],["Family gathering","Spotkanie rodzinne"],["Twelve dishes","Dwanaście potraw"],["Fried carp","Smażony karp"],["Mistletoe","Jemioła"],["Angel","Anioł"],["Holiday season","Okres świąteczny"],["Peace","Pokój"],["Happiness","Szczęście"]],"phrases":[["Merry Christmas!","Wesołych Świąt!"],["Happy New Year!","Szczęśliwego Nowego Roku!"],["I wish you peace and happiness this Christmas.","Życzę ci pokoju i szczęścia w te Święta."],["Are you ready for Christmas?","Czy jesteś gotowy/gotowa na Święta?"],["What are your Christmas traditions?","Jakie są twoje tradycje bożonarodzeniowe?"],["Let’s sing Christmas carols.","Zaśpiewajmy kolędy."],["Did you decorate the Christmas tree?","Czy udekorowałeś/udekorowałaś choinkę?"],["Have a wonderful Christmas!","Wspaniałych Świąt!"],["Do you have a favorite Christmas dish?","Masz ulubione danie świąteczne?"],["I hope Santa brings you lots of gifts!","Mam nadzieję, że Święty Mikołaj przyniesie ci dużo prezentów!"],["We always gather on Christmas Eve.","Zawsze spotykamy się w Wigilię."],["Would you like to join us for Christmas dinner?","Chciałbyś/Chciałabyś dołączyć do nas na kolację wigilijną?"],["Wishing you a joyful holiday season.","Życzę ci radosnego okresu świątecznego."],["The Christmas market is beautiful!","Jarmark bożonarodzeniowy jest piękny!"],["Let’s exchange gifts.","Wymieńmy się prezentami."],["I love the smell of gingerbread.","Uwielbiam zapach piernika."],["Are you going to Midnight Mass?","Czy idziesz na Pasterkę?"],["What do you want for Christmas?","Co chcesz na Święta?"],["We share the wafer on Christmas Eve.","Dzielimy się opłatkiem w Wigilię."],["I hope you have a peaceful Christmas.","Mam nadzieję, że będziesz mieć spokojne Święta."],["I’m so excited for Christmas!","Nie mogę się doczekać Świąt!"],["Let’s light some candles for the holiday.","Zapalmy świece na Święta."],["I made some Christmas cookies.","Upiekłem/Upiekłam świąteczne ciasteczka."],["Do you like Christmas carols?","Lubisz kolędy?"],["Have a wonderful holiday with family and friends!","Wspaniałych świąt z rodziną i przyjaciółmi!"]]},{"id":"newyear","title":"New Year","eps":[52],"words":[["New Year’s Eve","Sylwester"],["New Year’s Day","Nowy Rok"],["Celebration","Świętowanie"],["Fireworks","Fajerwerki"],["Midnight","Północ"],["Countdown","Odliczanie"],["Champagne","Szampan"],["Resolution","Postanowienie"],["Party","Impreza"],["Toast","Toast"],["Confetti","Konfetti"],["Music","Muzyka"],["Dance","Taniec"],["Invitation","Zaproszenie"],["Ring in the New Year","Witać Nowy Rok"],["Kiss","Pocałunek"],["Celebrate","Świętować"],["New beginning","Nowy początek"],["Goals","Cele"],["Happiness","Szczęście"],["Prosperity","Pomyślność"],["Health","Zdrowie"],["Tradition","Tradycja"],["Cheers!","Na zdrowie!"],["Success","Sukces"]],"phrases":[]},{"id":"easter","title":"Easter","eps":[69,70],"words":[["Easter","Wielkanoc"],["Holy Week","Wielki Tydzień"],["Palm Sunday","Niedziela Palmowa"],["Easter Sunday","Niedziela Wielkanocna"],["Resurrection","Zmartwychwstanie"],["Blessing of the Baskets","Święcenie koszyków"],["Easter egg","Pisanka"],["Egg decorating","Malowanie jajek"],["Easter bunny","Zajączek wielkanocny"],["Lamb (symbol)","Baranek"],["Easter breakfast","Śniadanie wielkanocne"],["Traditional Easter meal","Tradycyjny posiłek wielkanocny"],["Sausage","Kiełbasa"],["Horseradish","Chrzan"],["Bread","Chleb"],["Salt","Sól"],["Sugar lamb","Cukrowy baranek"],["Easter basket","Koszyk wielkanocny"],["Easter Monday","Poniedziałek Wielkanocny"],["Wet Monday (tradition)","Śmigus-Dyngus"],["Blessing","Błogosławieństwo"],["Church","Kościół"],["Cross","Krzyż"],["Joy","Radość"],["Celebration","Uroczystość"]],"phrases":[["Happy Easter!","Wesołych Świąt Wielkanocnych!"],["Christ is risen!","Chrystus zmartwychwstał!"],["Wishing you a joyful Easter.","Życzę ci radosnych Świąt Wielkanocnych."],["Are you ready for Easter?","Czy jesteś gotowy/gotowa na Wielkanoc?"],["Have a blessed Easter Sunday.","Błogosławionej Niedzieli Wielkanocnej."],["Do you want to decorate Easter eggs?","Chcesz malować pisanki?"],["Let’s prepare the Easter basket.","Przygotujmy koszyk wielkanocny."],["Will you go to church for Easter?","Czy pójdziesz do kościoła na Wielkanoc?"],["The table looks beautiful with all the Easter decorations.","Stół wygląda pięknie z tymi wielkanocnymi ozdobami."],["What are your Easter traditions?","Jakie są twoje tradycje wielkanocne?"],["We will share the Easter basket on Sunday.","Podzielimy się koszykiem wielkanocnym w niedzielę."],["I love Easter breakfast.","Uwielbiam śniadanie wielkanocne."],["The lamb is a symbol of Easter.","Baranek jest symbolem Wielkanocy."],["Let’s celebrate together.","Świętujmy razem."],["The Easter bunny brings joy to children.","Zajączek wielkanocny przynosi radość dzieciom."],["Do you want to join us for Easter breakfast?","Chcesz dołączyć do nas na śniadanie wielkanocne?"],["May this Easter bring peace and joy.","Niech te Święta Wielkanocne przyniosą pokój i radość."],["We will bless the Easter basket.","Poświęcimy koszyk wielkanocny."],["I hope the Easter season brings you happiness.","Mam nadzieję, że okres wielkanocny przyniesie ci szczęście."],["Easter is a time of renewal.","Wielkanoc to czas odnowy."],["The food in the Easter basket looks delicious.","Jedzenie w koszyku wielkanocnym wygląda pysznie."],["Let’s enjoy Easter traditions.","Cieszmy się tradycjami wielkanocnymi."],["Easter Monday is always fun!","Poniedziałek Wielkanocny zawsze jest zabawny!"],["I’m grateful to spend Easter with family.","Jestem wdzięczny/wdzięczna, że spędzam Wielkanoc z rodziną."],["Wishing you a peaceful and blessed Easter.","Życzę ci spokojnej i błogosławionej Wielkanocy."]]}]}];
+const ICON_SPEAK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>';
+const ICON_CHECK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>';
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+/* ---------- data prep ---------- */
+const ALPHA = [
+ ['a','a as in "father"','mama'],['ą','nasal "on", like French bon','są'],['b','b as in "bed"','brat'],['c','ts as in "cats"','cena'],
+ ['ć','soft "ch", tongue on the palate','być'],['d','d as in "dog"','dom'],['e','e as in "bed"','ekran'],['ę','nasal "en"; plain "e" at word end','ręka'],
+ ['f','f as in "fun"','fotel'],['g','always hard, as in "go"','gra'],['h','h, a little throaty','herbata'],['i','ee as in "see"','imię'],
+ ['j','y as in "yes"','jajko'],['k','k as in "kite"','kot'],['l','l as in "lamp"','lampa'],['ł','w as in "water"','łóżko'],
+ ['m','m as in "man"','mleko'],['n','n as in "nose"','nos'],['ń','ny as in "canyon"','koń'],['o','o as in "more", short','okno'],
+ ['ó','same sound as u: oo','ogród'],['p','p as in "pen"','pies'],['r','rolled r','ryba'],['s','s as in "sun"','syn'],
+ ['ś','soft "sh"','śnieg'],['t','t as in "top"','tata'],['u','oo as in "book"','ulica'],['w','v as in "van"','woda'],
+ ['y','i as in "bit", deeper','my'],['z','z as in "zoo"','zima'],['ź','soft "zh"','źle'],['ż','zh as in "measure"','żaba'],
+];
+const DIGRAPHS = [['ch','throaty h, same as h','chleb'],['cz','ch as in "church"','czas'],['sz','sh as in "shop"','szkoła'],['rz','zh, same as ż','rzeka'],['dz','ds as in "kids"','dzwon'],['dź','soft "j"','dźwięk'],['dż','j as in "jam"','dżem']];
+const VERBS = [
+ {inf:'być',en:'to be',f:['jestem','jesteś','jest','jest','jest','jesteśmy','jesteście','są','są'],e:['am','are','is','is','is','are','are','are','are']},
+ {inf:'mieć',en:'to have',f:['mam','masz','ma','ma','ma','mamy','macie','mają','mają'],e:['have','have','has','has','has','have','have','have','have']},
+ {inf:'czytać',en:'to read',f:['czytam','czytasz','czyta','czyta','czyta','czytamy','czytacie','czytają','czytają'],e:['read','read','reads','reads','reads','read','read','read','read']},
+ {inf:'gadać',en:'to talk',f:['gadam','gadasz','gada','gada','gada','gadamy','gadacie','gadają','gadają'],e:['talk','talk','talks','talks','talks','talk','talk','talk','talk']},
+ {inf:'słuchać',en:'to listen',f:['słucham','słuchasz','słucha','słucha','słucha','słuchamy','słuchacie','słuchają','słuchają'],e:['listen','listen','listens','listens','listens','listen','listen','listen','listen']},
+];
+const PRON = ['ja','ty','on','ona','ono','my','wy','oni','one'];
+const PRON_EN = ['I','you','he','she','it','we','you (pl.)','they (m.)','they (f./n.)'];
+/* Grammar lessons. Markup in text: [x] = highlighted ending, {x} = Polish word.
+   Practice items: [question with ___, English gloss, [correct, wrong, wrong...], explanation]. The correct option is always listed first; options are shuffled when shown. */
+const GRAMMAR = [
+{id:'g-gender', title:'Noun Gender', intro:'Every Polish noun is masculine, feminine or neuter. You can almost always tell from the last letter. Gender matters because it decides the ending of adjectives, past-tense verbs and most case endings.',
+ sections:[
+  {h:'Read the last letter', table:{head:['Gender','Usually ends in','Examples'],rows:[
+    ['Masculine','a consonant','{dom}, {stół}, {pokój}, {bilet}, {brat}, {pociąg}'],
+    ['Feminine','-a','{kuchni[a]}, {mam[a]}, {szkoł[a]}, {kaw[a]}, {łazienk[a]}'],
+    ['Neuter','-o, -e, -ę, -um','{okn[o]}, {łóżk[o]}, {śniadani[e]}, {imi[ę]}, {muze[um]}']]}},
+  {h:'Exceptions worth knowing', p:'Men and male relatives ending in -a are still masculine, because meaning wins: {mężczyzna} (man), {tata} (dad). Some feminine nouns end in a soft consonant, such as {noc} (night). Every noun ending in -ość is feminine: {miłość} (love), {radość} (joy). Nouns ending in -anie or -enie are neuter: {spotkanie} (meeting), {mieszkanie} (flat).'},
+ ],
+ examples:[['To jest kuchni[a].','This is the kitchen. (feminine)'],['To jest pokój.','This is the room. (masculine)'],['To jest okn[o].','This is the window. (neuter)']],
+ practice:[
+  ['What gender is {łazienka} (bathroom)?','',['Feminine','Masculine','Neuter'],'It ends in -a, the usual feminine ending.'],
+  ['What gender is {pokój} (room)?','',['Masculine','Feminine','Neuter'],'It ends in a consonant, so it is masculine.'],
+  ['What gender is {śniadanie} (breakfast)?','',['Neuter','Feminine','Masculine'],'Nouns ending in -anie and -enie are neuter.'],
+  ['What gender is {miłość} (love)?','',['Feminine','Masculine','Neuter'],'Every noun ending in -ość is feminine, even though it ends in a consonant.'],
+  ['What gender is {tata} (dad)?','',['Masculine','Feminine','Neuter'],'It ends in -a, but a dad is male, so the word is masculine.'],
+  ['What gender is {imię} (first name)?','',['Neuter','Feminine','Masculine'],'Nouns ending in -ę are neuter.'],
+  ['What gender is {lotnisko} (airport)?','',['Neuter','Masculine','Feminine'],'It ends in -o, the usual neuter ending.'],
+  ['What gender is {pociąg} (train)?','',['Masculine','Neuter','Feminine'],'It ends in a consonant, so it is masculine.'],
+  ['What gender is {muzeum} (museum)?','',['Neuter','Masculine','Feminine'],'Nouns ending in -um are neuter.'],
+ ]},
+
+{id:'g-adj', title:'Adjective Endings', intro:'Adjectives copy the gender of the noun they describe. You saw this in the Colors episode: {czerwony}, {czerwona}, {czerwone} are all "red".',
+ sections:[
+  {h:'The three endings', table:{head:['','Masculine','Feminine','Neuter'],rows:[
+    ['new','{now[y]} dom','{now[a]} kuchnia','{now[e]} okno'],
+    ['big','{duż[y]} hotel','{duż[a]} szkoła','{duż[e]} łóżko'],
+    ['expensive','{drog[i]} bilet','{drog[a]} kawa','{drog[e]} mieszkanie'],
+    ['Polish','{polsk[i]} film','{polsk[a]} zupa','{polsk[e]} piwo']]}},
+  {h:'-y or -i?', p:'After k and g the masculine ending is -i instead of -y: {drogi}, {polski}, {wysoki} (tall). Everything else works the same way.'},
+  {h:'Describing yourself', p:'When you describe yourself, the adjective matches your own gender. A man says {Jestem gotowy}, a woman says {Jestem gotowa} (I am ready). That is why your phrase lists show pairs like {gotowy/gotowa} and {wdzięczny/wdzięczna}.'},
+  {h:'Plural', p:'For things, and for groups of only women, the plural ends in -e: {nowe bilety}. For groups that include men, it usually ends in -i or -y, often with a sound change: {Sąsiedzi są bardzo głośni} (The neighbours are very loud).'},
+ ],
+ examples:[['Mój współlokator jest bardzo czyst[y].','My roommate is very clean.'],['Jaki ładn[y] dzień!','What a nice day!'],['Jestem zmęczon[a].','I am tired. (said by a woman)']],
+ practice:[
+  ['___ kuchnia','red kitchen',['czerwona','czerwony','czerwone'],'{kuchnia} is feminine, so the adjective ends in -a.'],
+  ['___ okno','big window',['duże','duży','duża'],'{okno} is neuter, so the adjective ends in -e.'],
+  ['___ hotel','expensive hotel',['drogi','droga','drogie'],'{hotel} is masculine. After g the ending is -i, not -y.'],
+  ['Jestem ___.','I am ready. (said by a woman)',['gotowa','gotowy','gotowe'],'A woman describing herself uses the feminine ending -a.'],
+  ['Mój współlokator jest bardzo ___.','My roommate is very clean.',['czysty','czysta','czyste'],'{współlokator} is masculine, so -y.'],
+  ['___ dziecko','small child',['małe','mały','mała'],'{dziecko} ends in -o, so it is neuter and takes -e.'],
+  ['Ona jest ___.','She is tired.',['zmęczona','zmęczony','zmęczone'],'{ona} is feminine, so -a.'],
+  ['To jest ___ herbata.','This is good tea.',['dobra','dobry','dobre'],'{herbata} is feminine, so -a.'],
+ ]},
+
+{id:'g-verbs', title:'Verb Patterns', intro:'Polish verbs change their ending for each person, so you can usually drop the pronoun: {mieszkam} already means "I live". Most verbs follow one of three patterns.',
+ sections:[
+  {h:'The three patterns', table:{head:['Person','Pattern 1: -am','Pattern 2: -ę / -isz','Pattern 3: -ę / -esz'],rows:[
+    ['ja','czyt[am]','mów[ię]','pisz[ę]'],
+    ['ty','czyt[asz]','mów[isz]','pisz[esz]'],
+    ['on / ona / ono','czyt[a]','mów[i]','pisz[e]'],
+    ['my','czyt[amy]','mów[imy]','pisz[emy]'],
+    ['wy','czyt[acie]','mów[icie]','pisz[ecie]'],
+    ['oni / one','czyt[ają]','mów[ią]','pisz[ą]']]}},
+  {h:'Which pattern is it?', p:'Most verbs ending in -ać follow pattern 1: {mieszkać}, {słuchać}, {pytać}. Most verbs ending in -ić or -yć follow pattern 2: {mówić}, {robić}, {lubić}, {uczyć się}. Pattern 2 also covers {musieć} (muszę, musisz) and {widzieć} (widzę, widzisz). Pattern 3 includes {pisać} (piszę), {chcieć} (chcę, chcesz), {móc} (mogę, możesz), {pić} (piję, pijesz) and {iść} (idę, idziesz).'},
+  {h:'A shortcut', p:'If the "I" form ends in -m, the rest follow pattern 1. If it ends in -ę, look at the "you" form: -isz or -ysz means pattern 2, -esz means pattern 3.'},
+ ],
+ examples:[['Mieszk[am] w Warszawie.','I live in Warsaw.'],['Czy mo[gę] tu usiąść?','Can I sit here?'],['Lub[isz] zwierzęta?','Do you like animals?'],['Musz[ę] wziąć prysznic.','I have to take a shower.']],
+ practice:[
+  ['Ja ___ po polsku.','I speak Polish. (mówić)',['mówię','mówisz','mówi'],'Pattern 2: the "I" form ends in -ę.'],
+  ['Czy ty ___ kawę?','Do you like coffee? (lubić)',['lubisz','lubię','lubi'],'Pattern 2: the "you" form ends in -isz.'],
+  ['My ___ w Warszawie.','We live in Warsaw. (mieszkać)',['mieszkamy','mieszkacie','mieszkają'],'Pattern 1: "we" ends in -amy.'],
+  ['Oni ___ dużo.','They write a lot. (pisać)',['piszą','piszecie','pisze'],'Pattern 3: "they" ends in -ą.'],
+  ['Czy ___ tu usiąść?','Can I sit here? (móc)',['mogę','możesz','może'],'{móc} is pattern 3: mogę, możesz, może.'],
+  ['Ona ___ herbatę.','She wants tea. (chcieć)',['chce','chcę','chcą'],'Pattern 3: "she" ends in -e. {chcę} is "I want".'],
+  ['Wy ___ książkę.','You (all) are reading a book. (czytać)',['czytacie','czytamy','czytają'],'Pattern 1: "you all" ends in -acie.'],
+  ['___ wziąć prysznic.','I have to take a shower. (musieć)',['Muszę','Musisz','Musi'],'Pattern 2: the "I" form is {muszę}.'],
+  ['Co ___ w wolnym czasie?','What do you do in your free time? (robić)',['robisz','robię','robi'],'Pattern 2: the "you" form ends in -isz.'],
+ ]},
+
+{id:'g-past', title:'Past Tense & "I Would"', intro:'In the past tense, the verb ending shows the speaker\'s gender. This is why your phrase lists show pairs like {Zgubiłem/Zgubiłam się} (I\'m lost) and {Upiekłem/Upiekłam} (I baked).',
+ sections:[
+  {h:'How to build it', p:'Take the infinitive, drop -ć, add -ł, then add the ending for the person: {być} → {był} → {byłem}. The same works for most verbs: {czytać} → {czytałem}, {mówić} → {mówiłam}.'},
+  {h:'być (to be) in the past', table:{head:['Person','Man / mixed group','Woman / women'],rows:[
+    ['I','był[em]','był[am]'],['you','był[eś]','był[aś]'],['he / she / it','był','był[a] (she), był[o] (it)'],
+    ['we','byl[iśmy]','był[yśmy]'],['you (pl.)','byl[iście]','był[yście]'],['they','byl[i]','był[y]']]}},
+  {h:'Days of the week', p:'The verb also matches the gender of the subject. {Wczoraj był poniedziałek} (masculine day), but {Wczoraj była środa} (feminine day). The same goes for weather: {Pogoda była ładna}.'},
+  {h:'"I would like" and "could you"', p:'Add -bym for "I would": a man says {Chciałbym}, a woman says {Chciałabym}. Asking someone, use -byś: {Czy mógłbyś mi pomóc?} to a man, {Czy mogłabyś mi pomóc?} to a woman.'},
+ ],
+ examples:[['Zgubił[em] się.','I\'m lost. (man)'],['Zgubił[am] się.','I\'m lost. (woman)'],['Usłyszał[em] o tym od Anny.','I heard about this from Anna. (man)'],['Chciał[abym] zrobić rezerwację.','I would like to make a reservation. (woman)']],
+ practice:[
+  ['___ w domu.','I was at home. (said by a woman)',['Byłam','Byłem','Było'],'Women use -łam for "I".'],
+  ['___ się.','I\'m lost. (said by a man)',['Zgubiłem','Zgubiłam','Zgubił'],'Men use -łem for "I".'],
+  ['Wczoraj ___ środa.','Yesterday was Wednesday.',['była','był','było'],'{środa} ends in -a, so it is feminine: {była}.'],
+  ['___ kawę.','I would like a coffee. (said by a woman)',['Chciałabym','Chciałbym','Chciałbyś'],'Women say {chciałabym}, men say {chciałbym}.'],
+  ['Czy ___ mi pomóc?','Could you help me? (asking a man)',['mógłbyś','mogłabyś','mógłbym'],'To a man: -łbyś. To a woman it would be {mogłabyś}.'],
+  ['Oni ___ tutaj.','They were here. (a group of men)',['byli','były','był'],'Groups that include a man use {byli}.'],
+  ['Czy ___ choinkę?','Did you decorate the tree? (asking a woman)',['udekorowałaś','udekorowałeś','udekorowała'],'Asking a woman: -łaś.'],
+  ['Pogoda ___ ładna.','The weather was nice.',['była','był','było'],'{pogoda} is feminine.'],
+ ]},
+
+{id:'g-cases', title:'The 7 Cases at a Glance', intro:'Polish nouns change their ending depending on their job in the sentence. These forms are called cases. You don\'t need to memorise every table now. Learn to spot the trigger words, and the endings will start to feel familiar.',
+ sections:[
+  {h:'What triggers each case', table:{head:['Case','Answers','Common triggers','Example'],rows:[
+    ['Nominative','who? what?','the subject; "to jest"','To jest {mam[a]}.'],
+    ['Genitive','of whom? of what?','{do}, {bez}, {dla}, {z} (from), {nie ma}, amounts','bilet do {Krakow[a]}'],
+    ['Dative','to whom?','giving, helping, thanking; {mi}, {ci}','Pomóż {m[i]}.'],
+    ['Accusative','whom? what?','the object of {mam}, {lubię}, {chcę}, {poproszę}','Poproszę {kaw[ę]}.'],
+    ['Instrumental','with whom? with what?','{z} (with), "jestem + noun", by means of','z {rodzin[ą]}'],
+    ['Locative','about / where?','{w}, {na}, {o}, {po} for location or topic','w {Warszawi[e]}'],
+    ['Vocative','calling someone','addressing a person','{Mam[o]}! {Pani Ann[o]}!']]}},
+  {h:'One word in every case', table:{head:['Case','brat (brother)','mama (mum)','okno (window)'],rows:[
+    ['Nominative','brat','mam[a]','okn[o]'],['Genitive','brat[a]','mam[y]','okn[a]'],['Dative','brat[u]','mam[ie]','okn[u]'],
+    ['Accusative','brat[a]','mam[ę]','okn[o]'],['Instrumental','brat[em]','mam[ą]','okn[em]'],['Locative','braci[e]','mam[ie]','okni[e]'],['Vocative','braci[e]!','mam[o]!','okn[o]!']]}},
+  {h:'Where to start', p:'The most useful cases for a beginner are accusative (ordering and wanting things), genitive (going to places, "without", "no") and locative (where you are). Each has its own lesson in this section.'},
+ ],
+ examples:[['Poproszę bilet do Berlin[a].','A ticket to Berlin, please.'],['Mieszkam w Warszawi[e].','I live in Warsaw.'],['Zapłacę kart[ą].','I\'ll pay by card.']],
+ practice:[
+  ['{do Krakowa} uses which case?','to Kraków',['Genitive','Locative','Accusative'],'{do} (to) always takes the genitive.'],
+  ['{w Warszawie} uses which case?','in Warsaw',['Locative','Genitive','Instrumental'],'{w} meaning "in" a place takes the locative.'],
+  ['{z rodziną} uses which case?','with the family',['Instrumental','Genitive','Dative'],'{z} meaning "with" takes the instrumental. The -ą ending gives it away.'],
+  ['{Poproszę kawę} uses which case?','A coffee, please.',['Accusative','Nominative','Genitive'],'The thing you ask for is the object, so accusative. Feminine -a becomes -ę.'],
+  ['{Mamo!} uses which case?','Mum!',['Vocative','Nominative','Dative'],'Calling someone uses the vocative.'],
+  ['{bez mięsa} uses which case?','without meat',['Genitive','Accusative','Locative'],'{bez} (without) always takes the genitive.'],
+  ['{To jest kuchnia} uses which case?','This is the kitchen.',['Nominative','Accusative','Locative'],'After "to jest" the noun stays in its dictionary form, the nominative.'],
+  ['{Pomóż mi} uses which case?','Help me.',['Dative','Accusative','Genitive'],'You help "to" someone in Polish, so {pomóc} takes the dative.'],
+ ]},
+
+{id:'g-acc', title:'Accusative: Ordering & Wanting', intro:'Use the accusative for the thing you have, want, like, buy or ask for. You use it every time you order food: {Poproszę zupę i sałatkę}.',
+ sections:[
+  {h:'The rules', table:{head:['Noun type','Change','Examples'],rows:[
+    ['Feminine (-a)','-a → -ę','{kaw[a]} → poproszę {kaw[ę]}; {zup[a]} → {zup[ę]}'],
+    ['Masculine thing','no change','{bilet} → kupię {bilet}; {pokój} → zarezerwować {pokój}'],
+    ['Masculine person or animal','add -a','{brat} → mam {brat[a]}; {pies} → mam {ps[a]}'],
+    ['Neuter','no change','{mleko} → lubię {mleko}']]}},
+  {h:'Adjectives follow along', p:'A feminine adjective changes from -a to -ą: {Poproszę czarną kawę} (A black coffee, please). A masculine adjective for a person changes to -ego: {Mam starszego brata} (I have an older brother).'},
+  {h:'Watch out', p:'A few common verbs take the genitive instead: {szukać} (look for) and {potrzebować} (need). That\'s why your lists say {Szukam taksówki} and {Potrzebuję tłumacza}.'},
+ ],
+ examples:[['Poproszę zup[ę] i sałatk[ę].','I\'ll have the soup and the salad.'],['Poproszę kaw[ę].','A coffee, please.'],['Chcę wynająć przewodnik[a].','I want to hire a guide.'],['Chcę zarezerwować pokój.','I want to book a room.']],
+ practice:[
+  ['Poproszę ___.','A coffee, please. (kawa)',['kawę','kawa','kawy'],'Feminine -a becomes -ę.'],
+  ['Mam ___.','I have a brother. (brat)',['brata','brat','bratem'],'Masculine people add -a.'],
+  ['Chcę zarezerwować ___.','I want to book a room. (pokój)',['pokój','pokoju','pokoja'],'Masculine things don\'t change.'],
+  ['Lubię ___.','I like tea. (herbata)',['herbatę','herbata','herbaty'],'Feminine -a becomes -ę.'],
+  ['Kupię ___.','I\'ll buy a ticket. (bilet)',['bilet','biletu','bileta'],'Masculine things don\'t change.'],
+  ['Masz ___?','Do you have a dog? (pies)',['psa','pies','psem'],'Animals count like people, so they add -a. The e drops out: {pies} → {psa}.'],
+  ['Poproszę ___.','The soup and the salad, please. (zupa, sałatka)',['zupę i sałatkę','zupa i sałatka','zupy i sałatki'],'Both nouns are feminine, so both change -a to -ę.'],
+  ['Widzę ___.','I can see the sea. (morze)',['morze','morza','morzu'],'Neuter nouns don\'t change.'],
+ ]},
+
+{id:'g-gen', title:'Genitive: To, Without, None', intro:'The genitive is the most common case after the nominative. You need it for going somewhere with {do}, for "without", for "there isn\'t any", and for amounts.',
+ sections:[
+  {h:'Trigger words', table:{head:['Trigger','Meaning','Example'],rows:[
+    ['{do}','to (a place)','bilet do {Krakow[a]}, idę do {szkoł[y]}'],
+    ['{bez}','without','bez {mięs[a]}'],
+    ['{dla}','for','menu dla {dzieci}, prezent dla {mam[y]}'],
+    ['{z}','from','jestem z {Polsk[i]}'],
+    ['{nie} + verb','no, not any','nie mam {czas[u]}'],
+    ['amounts','a glass of, a kilo of, more','szklanka {wod[y]}, więcej {chleb[a]}'],
+    ['{szukać}, {potrzebować}','look for, need','szukam {taksówk[i]}']]}},
+  {h:'Endings', table:{head:['Noun type','Ending','Examples'],rows:[
+    ['Feminine (-a)','-y, or -i after k, g and soft letters','{wod[y]}, {szkoł[y]}, {Polsk[i]}, {kuchn[i]}'],
+    ['Masculine','-a or -u','{Krakow[a]}, {brat[a]}, {chleb[a]}; {czas[u]}, {dom[u]}, {problem[u]}'],
+    ['Neuter (-o, -e)','-a','{mięs[a]}, {mlek[a]}, {okn[a]}']]}},
+  {h:'Masculine: -a or -u?', p:'People, animals, most towns and many everyday objects take -a. Most abstract ideas and many other things take -u. There\'s no perfect rule, so learn each one as you meet it. {do domu} (home) and {nie ma problemu} (no problem) are good ones to memorise.'},
+  {h:'Negation flips the case', p:'When you negate a sentence, the object switches from accusative to genitive: {Mam samochód} → {Nie mam samochodu}. {Mam kawę} → {Nie mam kawy}.'},
+ ],
+ examples:[['Poproszę bilet do Krakow[a].','A ticket to Kraków, please.'],['Czy mogę to dostać bez mięs[a]?','Can I get this without meat?'],['Czy mogę prosić więcej chleb[a]?','Could I have some more bread?'],['Nie ma problem[u].','No problem.']],
+ practice:[
+  ['Bilet do ___.','A ticket to Kraków. (Kraków)',['Krakowa','Kraków','Krakowie'],'{do} takes the genitive, and towns usually take -a. The ó becomes o.'],
+  ['Czy mogę to dostać bez ___?','Can I get this without meat? (mięso)',['mięsa','mięso','mięsem'],'{bez} takes the genitive. Neuter -o becomes -a.'],
+  ['Nie mam ___.','I don\'t have time. (czas)',['czasu','czas','czasem'],'Negation takes the genitive, and {czas} takes -u.'],
+  ['Szklanka ___.','A glass of water. (woda)',['wody','woda','wodę'],'Amounts take the genitive. Feminine -a becomes -y.'],
+  ['Jestem z ___.','I\'m from Poland. (Polska)',['Polski','Polska','Polsce'],'{z} meaning "from" takes the genitive. After k the ending is -i.'],
+  ['Idę do ___.','I\'m going to school. (szkoła)',['szkoły','szkole','szkołę'],'{do} takes the genitive: -a becomes -y.'],
+  ['Nie mam ___.','I don\'t have a car. (samochód)',['samochodu','samochód','samochodzie'],'Negation flips the object to the genitive, and {samochód} takes -u.'],
+  ['Szukam ___.','I\'m looking for a taxi. (taksówka)',['taksówki','taksówkę','taksówka'],'{szukać} takes the genitive. After k the ending is -i.'],
+ ]},
+
+{id:'g-loc', title:'Locative: Where You Are', intro:'The locative only appears after prepositions, mainly {w} (in), {na} (on, at) and {o} (about). You use it whenever you say where you are or what you\'re talking about.',
+ sections:[
+  {h:'Endings', table:{head:['Noun type','Ending','Examples'],rows:[
+    ['Feminine (-a)','-e, often with a sound change','{Warszaw[a]} → w {Warszawi[e]}; {szkoł[a]} → w {szkol[e]}; {Polsk[a]} → w {Polsc[e]}'],
+    ['Feminine (soft)','-y or -i','{prac[a]} → w {prac[y]}; {kuchni[a]} → w {kuchn[i]}; {restauracj[a]} → w {restauracj[i]}'],
+    ['Masculine / neuter','-u after k, g, ch and soft letters','{dom} → w {dom[u]}; {pokój} → w {pokoj[u]}; {lotnisk[o]} → na {lotnisk[u]}; {pociąg} → w {pociąg[u]}'],
+    ['Masculine / neuter','-e after most other letters, often with a sound change','{Kraków} → w {Krakowi[e]}; {sklep} → w {sklepi[e]}; {miast[o]} → w {mieści[e]}']]}},
+  {h:'Sound changes', p:'Before -e, some consonants soften: ł → l (szkoła → szkole), k → c (Polska → Polsce), t → ci (miasto → mieście), r → rz (teatr → teatrze). Don\'t try to memorise these now. You\'ll start to hear them.'},
+  {h:'w or na?', p:'Use {w} for inside enclosed places: {w domu}, {w pracy}, {w szkole}. Use {na} for open places, events and some fixed expressions: {na lotnisku}, {na dworcu}, {na poczcie}.'},
+ ],
+ examples:[['Mieszkam w Warszawi[e].','I live in Warsaw.'],['Czy w tym pociąg[u] jest Wi-Fi?','Is there Wi-Fi on this train?'],['Jestem w dom[u].','I\'m at home.'],['Nie chcę o ni[m] rozmawiać.','I don\'t want to talk about him.']],
+ practice:[
+  ['Mieszkam w ___.','I live in Warsaw. (Warszawa)',['Warszawie','Warszawy','Warszawę'],'Location after {w} takes the locative: -a becomes -ie.'],
+  ['Jestem w ___.','I\'m at home. (dom)',['domu','domie','dom'],'{dom} takes -u in the locative.'],
+  ['Czekam na ___.','I\'m waiting at the airport. (lotnisko)',['lotnisku','lotnisko','lotniska'],'After k the locative ending is -u.'],
+  ['Pracuję w ___.','I work at a school. (szkoła)',['szkole','szkoły','szkołę'],'-a becomes -e, and ł softens to l.'],
+  ['Czy w tym ___ jest Wi-Fi?','Is there Wi-Fi on this train? (pociąg)',['pociągu','pociągie','pociąga'],'After g the locative ending is -u.'],
+  ['Jestem w ___.','I\'m at work. (praca)',['pracy','prace','pracę'],'{praca} has a soft stem, so the ending is -y.'],
+  ['Mieszkam w ___.','I live in Poland. (Polska)',['Polsce','Polski','Polskie'],'-a becomes -e, and k softens to c.'],
+  ['Rozmawiamy o ___.','We\'re talking about the film. (film)',['filmie','filmu','filmem'],'{o} (about) takes the locative. After m the ending is -ie.'],
+ ]},
+
+{id:'g-inst', title:'Instrumental: With & Being', intro:'The instrumental has three main jobs: "with" someone or something, how you do something (by card, by train), and saying what someone is after {jestem}.',
+ sections:[
+  {h:'Endings', table:{head:['Noun type','Ending','Examples'],rows:[
+    ['Feminine (-a)','-ą','{rodzin[a]} → z {rodzin[ą]}; {kart[a]} → {kart[ą]}; {gotówk[a]} → {gotówk[ą]}'],
+    ['Masculine','-em (-iem after k, g)','{brat} → z {brat[em]}; {autobus} → {autobus[em]}; {pociąg} → {pociąg[iem]}'],
+    ['Neuter','-em (-iem after k, g)','{mlek[o]} → z {mlek[iem]}'],
+    ['Plural','usually -ami','z {koleg[ami]} (with friends)']]}},
+  {h:'Three everyday uses', table:{head:['Use','Example','Meaning'],rows:[
+    ['with (after {z})','kawa z {mlek[iem]}','coffee with milk'],
+    ['how / by means of','Zapłacę {kart[ą]}. Jadę {pociąg[iem]}.','I\'ll pay by card. I\'m going by train.'],
+    ['being (after {jestem})','Jestem {Polak[iem]}. Jestem {Polk[ą]}.','I\'m Polish. (man / woman)']]}},
+ ],
+ examples:[['Zapłacę gotówk[ą].','I\'ll pay in cash.'],['Jestem Polk[ą].','I am Polish. (woman)'],['Wspaniałych świąt z rodzin[ą]!','Have a wonderful holiday with family!']],
+ practice:[
+  ['Zapłacę ___.','I\'ll pay by card. (karta)',['kartą','kartę','karty'],'"By means of" takes the instrumental: feminine -a becomes -ą.'],
+  ['Kawa z ___.','Coffee with milk. (mleko)',['mlekiem','mleka','mleko'],'{z} meaning "with" takes the instrumental. After k it is -iem.'],
+  ['Jadę ___.','I\'m going by train. (pociąg)',['pociągiem','pociągu','pociąg'],'Means of transport takes the instrumental. After g it is -iem.'],
+  ['Jestem ___.','I am Polish. (said by a man: Polak)',['Polakiem','Polak','Polaka'],'After {jestem} + noun, use the instrumental.'],
+  ['Idę z ___.','I\'m going with my brother. (brat)',['bratem','brata','bratu'],'{z} meaning "with" takes the instrumental: -em.'],
+  ['Spędzam Wielkanoc z ___.','I\'m spending Easter with the family. (rodzina)',['rodziną','rodziny','rodzinę'],'Feminine -a becomes -ą.'],
+  ['Ona jest ___.','She is a teacher. (nauczycielka)',['nauczycielką','nauczycielka','nauczycielkę'],'After a form of "to be" + noun, use the instrumental.'],
+  ['Jadę ___.','I\'m going by bus. (autobus)',['autobusem','autobusu','autobus'],'Masculine nouns take -em.'],
+ ]},
+
+{id:'g-pron', title:'Me, You, Him: Pronoun Forms', intro:'Pronouns change by case too. Many of your phrases already use them: {Miło mi}, {Podoba mi się}, {Czy możesz mi pomóc?}, {Kocham cię}.',
+ sections:[
+  {h:'The forms you\'ll use most', table:{head:['Pronoun','object: "me"','"to me"','"with me"','"about me"'],rows:[
+    ['ja (I)','mnie','mi','mną','mnie'],['ty (you)','cię','ci','tobą','tobie'],['on (he)','go','mu','nim','nim'],['ona (she)','ją','jej','nią','niej'],
+    ['my (we)','nas','nam','nami','nas'],['wy (you all)','was','wam','wami','was'],['oni / one (they)','ich / je','im','nimi','nich']]}},
+  {h:'Short and long forms', p:'Short forms like {mi}, {ci}, {cię}, {go} and {mu} are the everyday ones. Long forms ({mnie}, {tobie}, {ciebie}, {jego}, {jemu}) are used for emphasis, at the start of a sentence, or after a preposition: {Mnie również} (Me too), {dla ciebie} (for you).'},
+  {h:'The n- after prepositions', p:'After a preposition, the "he", "she" and "they" forms start with n-: {dla niego}, {z nią}, {o nich}. Without a preposition: {widzę go}, {widzę ją}.'},
+ ],
+ examples:[['Miło m[i].','Nice to meet you. (literally: pleasant to me)'],['Podoba m[i] się twój dom.','I like your house. (literally: your house pleases me)'],['Życzę c[i] spokojnych Świąt.','I wish you a peaceful Christmas.'],['Nie chcę o ni[m] rozmawiać.','I don\'t want to talk about him.']],
+ practice:[
+  ['Czy możesz ___ pomóc?','Can you help me?',['mi','mnie','mną'],'{pomóc} takes the dative: "to me" is {mi}.'],
+  ['Kocham ___.','I love you.',['cię','ci','tobą'],'The object "you" is {cię}.'],
+  ['Idziesz ze ___?','Are you coming with me?',['mną','mi','mnie'],'"With me" is {ze mną}. The z becomes ze to make it easier to say.'],
+  ['Życzę ___ Wesołych Świąt.','I wish you a Merry Christmas.',['ci','cię','ty'],'You wish something "to" someone: dative {ci}.'],
+  ['Nie chcę o ___ rozmawiać.','I don\'t want to talk about him.',['nim','go','on'],'{o} takes the locative, with n-: {nim}.'],
+  ['Widzę ___.','I can see her.',['ją','jej','ona'],'The object "her" is {ją}.'],
+  ['Podoba ___ się.','I like it. (It pleases me.)',['mi','mnie','mną'],'Literally "it pleases to me", so dative {mi}.'],
+  ['To prezent dla ___.','This is a present for them.',['nich','ich','im'],'{dla} takes the genitive. After a preposition use the n- form: {nich}.'],
+ ]},
+
+{id:'g-num', title:'Plurals & Counting', intro:'Polish counting has one quirky rule: the noun ending depends on the number. That\'s why your Basic Conversations list has {Mam... lat} for "I am... years old".',
+ sections:[
+  {h:'The counting rule', table:{head:['Number','Noun form','Example','Years'],rows:[
+    ['1','singular','jeden {bilet}','1 {rok}'],
+    ['2, 3, 4 (also 22–24, 32–34...)','plural','dwa {bilet[y]}','23 {lat[a]}'],
+    ['5–21 (also 25–31...)','genitive plural','pięć {bilet[ów]}','25 {lat}']]}},
+  {h:'Making plurals', table:{head:['Noun type','Plural ending','Examples'],rows:[
+    ['Masculine / feminine, hard','-y, or -i after k and g','{bilet[y]}, {sklep[y]}, {książk[i]}'],
+    ['Masculine / feminine, soft','-e','{pokoj[e]}, {kuchni[e]}, {ulic[e]}'],
+    ['Neuter','-a','{okn[a]}, {łóżk[a]}, {jabłk[a]}'],
+    ['Irregular','learn these','{dziecko} → {dzieci}; {człowiek} → {ludzie}; {rok} → {lata}']]}},
+  {h:'Genitive plural', p:'This is the form after 5+, "how many" and "a kilo of". Masculine nouns usually add -ów: {biletów}, {domów}. Feminine and neuter nouns often just drop the ending, sometimes adding an e: {osoba} → {osób} (Ile osób? How many people?), {jabłko} → {jabłek} (kilogram jabłek).'},
+  {h:'dwa or dwie?', p:'"Two" changes with gender: {dwa bilety} (masculine), {dwa piwa} (neuter), but {dwie kawy} (feminine).'},
+ ],
+ examples:[['Mam 25 lat.','I am 25 years old.'],['Mam 22 lat[a].','I am 22 years old.'],['Poproszę kilogram jabł[ek].','A kilo of apples, please.'],['Ile os[ób]?','How many people?']],
+ practice:[
+  ['Mam 30 ___.','I am 30 years old.',['lat','lata','rok'],'30 follows the 5+ rule, so genitive plural: {lat}.'],
+  ['Mam 23 ___.','I am 23 years old.',['lata','lat','roku'],'Numbers ending in 2, 3 or 4 (except 12–14) take {lata}.'],
+  ['Poproszę dwa ___.','Two tickets, please. (bilet)',['bilety','biletów','bilet'],'2, 3 and 4 take the ordinary plural.'],
+  ['Pięć ___.','Five tickets. (bilet)',['biletów','bilety','bilet'],'5 and up take the genitive plural: masculine -ów.'],
+  ['Kilogram ___.','A kilo of apples. (jabłko)',['jabłek','jabłka','jabłkami'],'Amounts take the genitive plural. {jabłko} drops its ending and adds e.'],
+  ['Poproszę ___ kawy.','Two coffees, please.',['dwie','dwa','dwoje'],'{kawa} is feminine, so "two" is {dwie}.'],
+  ['The plural of {okno} is…','windows',['okna','okny','okien'],'Neuter -o becomes -a in the plural.'],
+  ['The plural of {książka} is…','books',['książki','książky','książke'],'After k, the plural ending is -i, not -y.'],
+ ]},
+
+{id:'g-basics', title:'Sentence Basics', intro:'A few small rules make your sentences sound natural: how to ask yes/no questions, where to put {nie}, double negatives, the little word {się}, and the polite {Pan} and {Pani}.',
+ sections:[
+  {h:'Questions with czy', p:'To turn a statement into a yes/no question, put {Czy} at the start: {Masz chwilę} → {Czy masz chwilę?} (Do you have a moment?). In speech you can also just raise your voice at the end.'},
+  {h:'nie goes right before the verb', p:'{Nie rozumiem} (I don\'t understand), {Nie wiem} (I don\'t know), {Nie mów nikomu} (Don\'t tell anyone).'},
+  {h:'Double negatives are correct', p:'With "nothing", "nobody" or "never" you still need {nie}: {Nic nie mam} (I have nothing), {Nikt nie wie} (Nobody knows), {Nigdy nie piję kawy} (I never drink coffee).'},
+  {h:'The word się', p:'{się} means "oneself" and is part of many verbs: {nazywam się} (I am called), {spotykamy się} (we meet each other), {uczę się} (I\'m learning). It usually follows the verb, but it never starts a sentence.'},
+  {h:'Being polite: Pan and Pani', p:'With strangers, shop staff and older people, use {Pan} (to a man) or {Pani} (to a woman) instead of {ty}. The verb takes the "he/she" form: {Co Pan poleca?} (What do you recommend?), {Czy może mi Pani pomóc?}. For a group, use {Państwo}.'},
+ ],
+ examples:[['Czy masz chwilę?','Do you have a moment?'],['Nie mów nikomu.','Don\'t tell anyone.'],['Nazywam się Anna.','My name is Anna.'],['Co Pan poleca?','What do you recommend? (to a man, polite)']],
+ practice:[
+  ['Which is the question "Do you have time?"','',['Czy masz czas?','Masz czy czas?','Czas masz czy?'],'{Czy} goes at the very start of a yes/no question.'],
+  ['How do you say "I don\'t know"?','',['Nie wiem.','Wiem nie.','Ja wiem nie.'],'{nie} goes right before the verb.'],
+  ['How do you say "Nobody knows"?','',['Nikt nie wie.','Nikt wie.','Nie nikt wie.'],'Polish uses a double negative: {nikt} + {nie}.'],
+  ['How do you say "I have nothing"?','',['Nic nie mam.','Mam nic.','Nie mam coś.'],'"Nothing" needs {nie} with the verb.'],
+  ['Ask a waiter politely: "What do you recommend?"','to a man',['Co Pan poleca?','Co Pan polecasz?','Co polecasz Pan?'],'With {Pan}, use the "he" form of the verb: {poleca}.'],
+  ['How do you say "My name is Anna"?','',['Nazywam się Anna.','Się nazywam Anna.','Nazywam Anna.'],'{się} follows the verb and can\'t start a sentence.'],
+  ['Ask a woman politely: "Can you help me?"','',['Czy może mi Pani pomóc?','Czy możesz mi Pani pomóc?','Czy Pani możesz mi pomóc?'],'With {Pani}, use the "she" form: {może}.'],
+  ['How do you say "We meet on Monday"?','',['Spotykamy się w poniedziałek.','Się spotykamy w poniedziałek.','Spotykamy w poniedziałek.'],'{spotykać się} needs {się}, right after the verb.'],
+ ]},
+];
+
+GROUPS.splice(1, 0, {id: 'grammar', name: 'Grammar & Word Endings', pl: 'Gramatyka', topics: GRAMMAR.map(g => ({id: g.id, title: g.title, eps: [], words: [], phrases: [], kind: 'grammar', g}))});
+/* text markup: [x] → highlighted ending, {x} → Polish word */
+const fmt = s => esc(s).replace(/\{([^}]*)\}/g, '<span class="pl">$1</span>').replace(/\[([^\]]*)\]/g, '<mark class="end">$1</mark>');
+const plain = s => s.replace(/[\[\]{}]/g, '');
+const isPhrase = (en, pl) => en.trim().split(/\s+/).length >= 4 || /[?!.…]$/.test(pl.trim()) || /\.\.\./.test(en);
+
+const TOPICS = {}; let TOTAL = 0;
+for (const g of GROUPS) for (const t of g.topics) {
+  t.group = g;
+  if (t.kind === 'verbs') {
+    t.phrases = [];
+    VERBS.forEach(v => PRON.forEach((p, i) => t.phrases.push([`${PRON_EN[i]} ${v.e[i]} (${v.inf})`, `${p} ${v.f[i]}`])));
+  }
+  if (t.kind === 'alphabet') {
+    t.words = ALPHA.concat(DIGRAPHS).map(([l, s, ex]) => [`${s} — e.g. ${ex}`, l]);
+  }
+  const all = [];
+  if (t.kind === 'grammar') for (const [q, gl, o, why] of t.g.practice) all.push({en: plain(q), pl: o[0], ph: false, q, gl, o, why});
+  else for (const [en, pl] of t.words.concat(t.phrases)) all.push({en, pl, ph: t.kind === 'verbs' ? false : isPhrase(en, pl)});
+  if (t.kind === 'verbs') all.forEach((x, i) => x.ph = i >= t.words.length);
+  all.forEach((x, i) => { x.id = t.id + ':' + i; x.t = t; });
+  t.all = all; if (t.kind !== 'grammar') TOTAL += all.length; TOPICS[t.id] = t;
+}
+
+/* ---------- storage ---------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('mpp:' + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('mpp:' + k, JSON.stringify(v)); } catch {} },
+};
+let known = store.get('known', {});
+let last = store.get('last', null);
+let streak = store.get('streak', {n: 0, day: null});
+const today = () => new Date().toISOString().slice(0, 10);
+function touchStreak() {
+  const d = today(); if (streak.day === d) return;
+  const y = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+  streak = {n: streak.day === y ? streak.n + 1 : 1, day: d}; store.set('streak', streak); updateStats();
+}
+function setKnown(id, v) { if (v) known[id] = 1; else delete known[id]; store.set('known', known); touchStreak(); updateStats(); }
+const knownIn = list => list.filter(x => known[x.id]).length;
+function updateStats() {
+  $('#sKnown').textContent = Object.keys(known).filter(k => TOPICS[k.split(':')[0]]).length.toLocaleString();
+  const d = today(), y = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+  $('#sStreak').textContent = (streak.day === d || streak.day === y) ? streak.n : 0;
+}
+
+/* ---------- speech ---------- */
+let plVoice = null; const canSpeak = 'speechSynthesis' in window;
+function pickVoice() {
+  try {
+    const vs = speechSynthesis.getVoices().filter(v => /^pl/i.test(v.lang));
+    const rank = v => /natural/i.test(v.name) ? 0 : /online|neural/i.test(v.name) ? 1 : /premium|enhanced/i.test(v.name) ? 2 : /google/i.test(v.name) ? 3 : 4;
+    plVoice = vs.sort((a, b) => rank(a) - rank(b))[0] || null;
+  } catch {}
+}
+if (canSpeak) { pickVoice(); try { speechSynthesis.onvoiceschanged = pickVoice; } catch {} }
+function say(text) {
+  if (!canSpeak) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/\//g, ', ').replace(/\.{2,}|…/g, ' '));
+    u.lang = 'pl-PL'; if (plVoice) u.voice = plVoice; u.rate = .9;
+    speechSynthesis.speak(u);
+    if (!plVoice) toast('No Polish voice found. Add one in your device’s speech settings.');
+  } catch {}
+}
+const speakBtn = (text, label = 'Hear it') => canSpeak ? `<button class="speak" data-say="${esc(text)}" aria-label="${label}" title="${label}">${ICON_SPEAK}</button>` : '';
+document.addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b) { e.stopPropagation(); say(b.dataset.say); } }, true);
+
+let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2200); }
+
+/* ---------- answer checking ---------- */
+const strip = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l').replace(/Ł/g, 'L');
+const norm = s => s.toLowerCase().replace(/\([^)]*\)/g, ' ').replace(/[.,!?¿¡;:"“”„'’…]/g, ' ').replace(/\s+/g, ' ').trim();
+function variants(pl) {
+  let out = [''];
+  for (const tok of pl.replace(/\([^)]*\)/g, ' ').split(/\s+/).filter(Boolean)) {
+    const opts = tok.includes('/') ? tok.split('/') : [tok];
+    const next = []; for (const o of out) for (const p of opts) next.push((o + ' ' + p).trim());
+    out = next.slice(0, 64);
+  }
+  out.push(pl); return [...new Set(out.map(norm))];
+}
+function check(input, pl) {
+  const a = norm(input); if (!a) return 'empty';
+  const vs = variants(pl);
+  if (vs.includes(a)) return 'ok';
+  if (vs.some(v => strip(v) === strip(a))) return 'near';
+  return 'bad';
+}
+
+/* ---------- routing ---------- */
+let view = {name: 'home'};
+function go(v) { view = v; render(); window.scrollTo({top: 0}); }
+function render() {
+  const app = $('#app');
+  if (view.name === 'home') app.innerHTML = homeHTML();
+  else app.innerHTML = topicHTML();
+  if (view.name !== 'home') mountMode();
+}
+
+/* ---------- home ---------- */
+function ring(pct) {
+  const r = 16, c = 2 * Math.PI * r;
+  return `<svg class="ring" viewBox="0 0 40 40" aria-hidden="true"><circle class="bg" cx="20" cy="20" r="${r}"/><circle class="fg" cx="20" cy="20" r="${r}" stroke-dasharray="${c * pct} ${c}"/><text x="20" y="24" text-anchor="middle">${Math.round(pct * 100)}</text></svg>`;
+}
+function homeHTML() {
+  let h = '';
+  const lt = last && (last.mix ? GROUPS.find(g => g.id === last.mix) : TOPICS[last.t]);
+  if (lt) h += `<div class="continue"><div><div class="label">Pick up where you left off</div><h3>${esc(last.mix ? lt.name + ' · mixed review' : lt.title)}</h3></div><button class="btn" data-go-last>Continue</button></div>`;
+  for (const g of GROUPS) {
+    const items = g.topics.flatMap(t => t.all), k = knownIn(items);
+    h += `<section class="group"><div class="ghead"><div><span class="gpl">${esc(g.pl)}</span><h2>${esc(g.name)}</h2></div>
+      <div class="ghead-r"><span class="muted num" style="font-size:.85rem">${k} / ${items.length}</span><div class="bar"><i style="width:${items.length ? k / items.length * 100 : 0}%"></i></div>
+      <button class="btn ghost" data-mix="${g.id}">Mixed review</button></div></div><div class="topics">`;
+    for (const t of g.topics) {
+      const kk = knownIn(t.all), w = t.all.filter(x => !x.ph).length, p = t.all.length - w;
+      if (t.kind === 'grammar') { h += `<button class="tcard" data-topic="${t.id}"><h3>${esc(t.title)}</h3>${ring(t.all.length ? kk / t.all.length : 0)}<span class="meta">Lesson · ${t.all.length} practice questions</span></button>`; continue; }
+      const parts = []; if (w) parts.push(`${w} ${t.kind === 'alphabet' ? 'letters' : t.kind === 'verbs' ? 'pronouns' : 'words'}`); if (p) parts.push(`${p} ${t.kind === 'verbs' ? 'verb forms' : 'phrases'}`);
+      h += `<button class="tcard" data-topic="${t.id}"><h3>${esc(t.title)}</h3>${ring(t.all.length ? kk / t.all.length : 0)}<span class="meta">${parts.join(' · ')} · Ep. ${t.eps.map(e => String(e).replace(/ \(.*\)/, '')).join(', ')}</span></button>`;
+    }
+    h += '</div></section>';
+  }
+  return h;
+}
+
+/* ---------- topic / mix view ---------- */
+let mode = 'sheet', dir = 'en', filter = 'all', session = null;
+function pool() {
+  if (view.mix) {
+    const g = GROUPS.find(g => g.id === view.mix);
+    let items = g.topics.filter(t => t.kind !== 'alphabet').flatMap(t => t.all);
+    const unk = items.filter(x => !known[x.id]);
+    return shuffle(unk.length >= 10 ? unk : items).slice(0, 30);
+  }
+  const t = TOPICS[view.t];
+  return t.all.filter(x => filter === 'all' || (filter === 'ph') === x.ph);
+}
+function topicHTML() {
+  const mix = !!view.mix, t = mix ? null : TOPICS[view.t], g = mix ? GROUPS.find(g => g.id === view.mix) : t.group;
+  const gram = mix ? g.id === 'grammar' : t.kind === 'grammar';
+  const modes = gram ? (mix ? [['practice','Practice']] : [['lesson','Lesson'],['practice','Practice']])
+    : mix ? [['cards','Flashcards'],['quiz','Quiz'],['type','Type it']]
+    : t.kind === 'alphabet' ? [['letters','Letters'],['cards','Flashcards']]
+    : t.kind === 'verbs' ? [['tables','Conjugations'],['sheet','Worksheet'],['cards','Flashcards'],['quiz','Quiz'],['type','Type it']]
+    : [['sheet','Worksheet'],['cards','Flashcards'],['quiz','Quiz'],['type','Type it']];
+  if (!modes.some(m => m[0] === mode)) mode = modes[0][0];
+  const hasBoth = !mix && t.kind !== 'alphabet' && t.all.some(x => x.ph) && t.all.some(x => !x.ph);
+  const lbl = t && t.kind === 'verbs' ? ['Pronouns', 'Verb forms'] : ['Words', 'Phrases'];
+  return `<button class="back" data-home>← All topics</button>
+  <div class="thead"><div><span class="gpl label" style="color:var(--red)">${esc(g.name)}</span>
+    <h2>${mix ? 'Mixed review' : esc(t.title)}</h2>
+    <div class="eps muted">${gram ? (mix ? 'Questions from every grammar lesson, favouring the ones you have not answered correctly yet' : `Grammar guide · ${knownIn(t.all)} of ${t.all.length} practice questions answered correctly`) : mix ? 'Up to 30 items from across this group, favouring the ones you have not marked known' : `From episode${t.eps.length > 1 ? 's' : ''} ${t.eps.map(e => '#' + String(e).replace(/ \(.*\)/, '')).join(' and ')} · ${knownIn(t.all)} of ${t.all.length} known`}</div></div></div>
+  <div class="tabs" role="tablist">${modes.map(([k, l]) => `<button class="tab" role="tab" aria-selected="${k === mode}" data-mode="${k}">${l}</button>`).join('')}</div>
+  <div class="toolbar" id="toolbar">
+    ${hasBoth && !['letters','tables'].includes(mode) ? `<div class="seg" aria-label="Show">${[['all','All'],['w',lbl[0]],['ph',lbl[1]]].map(([k, l]) => `<button aria-pressed="${filter === k}" data-filter="${k}">${l}</button>`).join('')}</div>` : ''}
+    ${['cards','quiz'].includes(mode) && !(t && t.kind === 'alphabet') ? `<div class="seg" aria-label="Direction"><button aria-pressed="${dir === 'en'}" data-dir="en">English → Polish</button><button aria-pressed="${dir === 'pl'}" data-dir="pl">Polish → English</button></div>` : ''}
+    <span class="spacer"></span>
+    ${['cards','quiz','type','practice'].includes(mode) ? '<button class="btn ghost" data-restart>Shuffle &amp; restart</button>' : ''}
+  </div>
+  <div id="mode"></div>`;
+}
+
+function mountMode() {
+  const el = $('#mode');
+  last = view.mix ? {mix: view.mix} : {t: view.t}; store.set('last', last);
+  if (mode === 'sheet') return sheet(el);
+  if (mode === 'letters') return letters(el);
+  if (mode === 'tables') return tables(el);
+  if (mode === 'lesson') return lesson(el);
+  session = {items: shuffle(pool()), i: 0, score: 0, flipped: false, answered: false, missed: []};
+  if (mode === 'practice') { if (view.mix) session.items = session.items.slice(0, 12); session.qs = session.items; return practice(el); }
+  if (mode === 'cards') return cards(el);
+  if (mode === 'quiz') return quiz(el);
+  if (mode === 'type') return typeit(el);
+}
+
+/* worksheet */
+function sheet(el) {
+  const items = pool();
+  if (!items.length) { el.innerHTML = '<div class="empty">Nothing here with this filter.</div>'; return; }
+  const row = x => `<div class="srow ${known[x.id] ? 'known' : ''}" data-row="${x.id}"><div class="en">${esc(x.en)}</div><div class="plw pl">${esc(x.pl)}</div>${speakBtn(x.pl)}<button class="know" aria-pressed="${!!known[x.id]}" aria-label="I know this: ${esc(x.pl)}" data-know="${x.id}">${known[x.id] ? ICON_CHECK : ''}</button></div>`;
+  const ws = items.filter(x => !x.ph), ps = items.filter(x => x.ph);
+  const t = TOPICS[view.t], lbl = t.kind === 'verbs' ? ['Pronouns', 'Verb forms'] : ['Words', 'Phrases'];
+  let h = `<div class="sheet"><div class="srow h"><span class="label">English</span><span class="label">Polish</span><span></span><span class="label">Know?</span></div>`;
+  if (ws.length && ps.length) h += `<div class="subhead label">${lbl[0]}</div>` + ws.map(row).join('') + `<div class="subhead label">${lbl[1]}</div>` + ps.map(row).join('');
+  else h += items.map(row).join('');
+  el.innerHTML = h + '</div>';
+}
+document.addEventListener('click', e => {
+  const k = e.target.closest('[data-know]'); if (!k) return;
+  const id = k.dataset.know, v = !known[id]; setKnown(id, v);
+  k.setAttribute('aria-pressed', v); k.innerHTML = v ? ICON_CHECK : '';
+  k.closest('.srow').classList.toggle('known', v);
+  const t = TOPICS[view.t]; if (t) { const e2 = document.querySelector('.thead .eps'); if (e2) e2.textContent = `From episode${t.eps.length > 1 ? 's' : ''} ${t.eps.map(e => '#' + String(e).replace(/ \(.*\)/, '')).join(' and ')} · ${knownIn(t.all)} of ${t.all.length} known`; }
+});
+
+/* alphabet */
+function letters(el) {
+  const cell = ([l, s, ex], sp) => `<button class="letter" data-say="${esc(l + '. ' + ex)}"><span class="L ${sp ? 'special' : ''}">${l.length === 1 ? l.toUpperCase() + l : l}</span><span class="s">${esc(s)}</span><span class="ex">${esc(ex)}</span></button>`;
+  const special = new Set(['ą','ć','ę','ł','ń','ó','ś','ź','ż']);
+  el.innerHTML = `<p class="note">Polish has 32 letters. The nine in red don't exist in English. There's no q, v or x in native words. Stress almost always falls on the second-to-last syllable. ${canSpeak ? 'Tap a letter to hear it with its example word.' : ''}</p>
+  <div class="alpha">${ALPHA.map(a => cell(a, special.has(a[0]))).join('')}</div>
+  <h3 style="margin:28px 0 12px;font-size:1.3rem">Letter pairs</h3><p class="muted" style="margin:-6px 0 14px">Two letters, one sound. Spotting these makes long words much easier to read.</p>
+  <div class="alpha">${DIGRAPHS.map(a => cell(a, false)).join('')}</div>`;
+}
+/* verbs */
+function tables(el) {
+  el.innerHTML = `<p class="note">Polish verbs change their ending for each person, so the pronoun is often dropped: <span class="pl">mam</span> already means "I have". Most verbs ending in <span class="pl">-ać</span> follow the same pattern as <span class="pl">czytać</span>: -am, -asz, -a, -amy, -acie, -ają.</p>
+  <div class="vgrid">${VERBS.map(v => `<div class="vtab"><h3><span class="pl">${v.inf}</span><small>${v.en}</small></h3><table>${PRON.map((p, i) => `<tr><td>${p}</td><td class="f">${v.f[i]}</td><td class="muted" style="font-size:.85rem">${PRON_EN[i]} ${v.e[i]}</td><td style="width:36px;padding:0 8px">${speakBtn(p + ' ' + v.f[i])}</td></tr>`).join('')}</table></div>`).join('')}</div>`;
+}
+
+/* grammar lesson */
+function lesson(el) {
+  const g = TOPICS[view.t].g;
+  const table = tb => `<div class="tablewrap"><table class="gtable"><thead><tr>${tb.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${tb.rows.map(r => `<tr>${r.map(c => `<td>${fmt(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  el.innerHTML = `<div class="lesson"><p class="lead">${fmt(g.intro)}</p>
+    ${g.sections.map(s => `<section><h3>${esc(s.h)}</h3>${s.p ? `<p>${fmt(s.p)}</p>` : ''}${s.table ? table(s.table) : ''}</section>`).join('')}
+    <section><h3>Examples</h3><p class="muted" style="margin-bottom:12px">The highlighted letters are the endings this lesson is about.</p><div class="exlist">
+      ${g.examples.map(([pl, en]) => `<div class="ex"><span class="pl">${fmt(pl)}</span><span class="muted">${esc(en)}</span>${speakBtn(plain(pl))}</div>`).join('')}</div></section>
+    <button class="btn primary" data-mode="practice">Practise this lesson →</button></div>`;
+}
+
+/* grammar practice */
+function practice(el) {
+  const s = session;
+  if (!s.items.length) { el.innerHTML = '<div class="empty">No practice questions here yet.</div>'; return; }
+  if (s.i >= s.qs.length) return finish(el, `${s.score} of ${s.qs.length} correct.`, s.missed.length ? `Retry the ${s.missed.length} you missed` : null, true);
+  const x = s.qs[s.i];
+  if (!s.opts) s.opts = shuffle(x.o);
+  const hasGap = x.q.includes('___');
+  el.innerHTML = `<div class="stage"><div class="count"><span class="num">Question ${s.i + 1} of ${s.qs.length}</span><span class="num">${s.score} correct</span></div>
+   <div class="prompt">${view.mix ? `<div class="label" style="margin-bottom:6px">${esc(x.t.title)}</div>` : `<div class="label" style="margin-bottom:6px">${hasGap ? 'Fill the gap' : 'Choose the answer'}</div>`}
+     <div class="big ${hasGap ? 'pl' : ''}" style="${hasGap ? '' : 'font-size:clamp(1.15rem,3.5vw,1.5rem)'}">${fmt(x.q).replace('___', '<span class="gap" aria-label="blank">&nbsp;</span>')}</div>
+     ${x.gl ? `<div class="gloss">${esc(x.gl)}</div>` : ''}</div>
+   <div class="opts">${s.opts.map((o, i) => `<button class="opt ${/^[A-Z][a-z]+$/.test(o) && !hasGap ? '' : 'pl'}" data-popt="${i}"><kbd>${i + 1}</kbd><span>${esc(o)}</span></button>`).join('')}</div>
+   <div id="pfb"></div><div class="actions" id="qnext"></div></div>`;
+}
+function practicePick(i) {
+  const s = session; if (s.answered || !s.opts || s.opts[i] == null) return;
+  s.answered = true; const x = s.qs[s.i], ok = s.opts[i] === x.pl;
+  document.querySelectorAll('.opt').forEach((b, j) => { b.disabled = true; if (s.opts[j] === x.pl) b.classList.add('right'); else if (j === i) b.classList.add('wrong'); });
+  if (ok) { s.score++; setKnown(x.id, true); } else { s.missed.push(x); if (known[x.id]) setKnown(x.id, false); }
+  const full = x.q.includes('___') ? plain(x.q).replace('___', x.pl) : null;
+  $('#pfb').innerHTML = `<div class="fb ${ok ? 'ok' : 'bad'}">${ok ? 'Dobrze! That’s right.' : `Not quite. The answer is <span class="pl">${esc(x.pl)}</span>.`}
+    ${full ? `<div class="pl" style="margin-top:6px;color:var(--ink)">${esc(full)} ${speakBtn(full)}</div>` : ''}<div class="why">${fmt(x.why)}</div></div>`;
+  if (full) say(full);
+  $('#qnext').innerHTML = `<button class="btn primary" data-pnext>${s.i + 1 < s.qs.length ? 'Next question' : 'See results'} →</button>`;
+  $('#qnext button').focus();
+}
+function practiceNext() { const s = session; s.i++; s.opts = null; s.answered = false; practice($('#mode')); }
+
+/* flashcards */
+function cards(el) {
+  const s = session;
+  if (!s.items.length) { el.innerHTML = '<div class="empty">Nothing to study with this filter.</div>'; return; }
+  if (s.i >= s.items.length) return finish(el, `You went through ${s.items.length} cards and marked ${s.score} as known.`, s.missed.length ? `Practise the ${s.missed.length} you are still learning` : null);
+  const x = s.items[s.i], alpha = x.t.kind === 'alphabet';
+  const front = alpha ? x.pl : dir === 'en' ? x.en : x.pl, back = alpha ? x.en : dir === 'en' ? x.pl : x.en;
+  el.innerHTML = `<div class="stage"><div class="count"><span class="num">${s.i + 1} / ${s.items.length}</span><span>${known[x.id] ? 'Marked known' : ''}</span></div>
+   <div class="card" id="card" role="button" tabindex="0" aria-label="Flip card">${speakBtn(x.pl)}
+     <div class="side"><div class="big ${alpha ? '' : dir === 'pl' ? 'pl' : ''}" style="${alpha ? 'font-size:4rem' : ''}">${esc(front)}</div>
+     ${s.flipped ? `<div class="ans" style="${alpha ? 'color:var(--ink);font-size:1.2rem' : dir === 'pl' ? 'color:var(--ink)' : ''}">${esc(back)}</div>` : '<div class="hint">Tap or press Space to flip</div>'}</div></div>
+   <div class="actions">${s.flipped ? `<button class="btn again" data-card="again">Still learning</button><button class="btn got" data-card="got">I know it</button>` : '<button class="btn primary" data-card="flip">Show answer</button>'}</div></div>`;
+  $('#card').onclick = () => flipCard();
+  if (s.flipped && !alpha && dir === 'en') say(x.pl);
+}
+function flipCard() { if (mode !== 'cards' || !session || session.flipped) return; session.flipped = true; cards($('#mode')); $('#card').classList.add('flip'); }
+function cardAnswer(got) {
+  const s = session, x = s.items[s.i];
+  if (got) { s.score++; setKnown(x.id, true); } else { s.missed.push(x); if (known[x.id]) setKnown(x.id, false); }
+  s.i++; s.flipped = false; cards($('#mode'));
+}
+
+/* quiz */
+function quiz(el) {
+  const s = session;
+  if (s.items.length < 2) { el.innerHTML = '<div class="empty">Not enough items for a quiz with this filter.</div>'; return; }
+  if (!s.qs) s.qs = s.items.slice(0, Math.min(10, s.items.length));
+  if (s.i >= s.qs.length) return finish(el, `${s.score} of ${s.qs.length} correct.`, s.missed.length ? `Retry the ${s.missed.length} you missed` : null, true);
+  const x = s.qs[s.i];
+  if (!s.opts) {
+    const src = view.mix ? s.items : x.t.all;
+    let others = shuffle(src.filter(y => y !== x && y.ph === x.ph && y.pl !== x.pl && y.en !== x.en));
+    if (others.length < 3) others = others.concat(shuffle(src.filter(y => y !== x && !others.includes(y) && y.pl !== x.pl)));
+    s.opts = shuffle([x, ...others.slice(0, 3)]);
+  }
+  const q = dir === 'en' ? x.en : x.pl, ans = y => dir === 'en' ? y.pl : y.en;
+  el.innerHTML = `<div class="stage"><div class="count"><span class="num">Question ${s.i + 1} of ${s.qs.length}</span><span class="num">${s.score} correct</span></div>
+   <div class="prompt">${dir === 'pl' ? speakBtn(x.pl) : ''}<div class="label" style="margin-bottom:6px">${dir === 'en' ? 'How do you say' : 'What does this mean?'}</div><div class="big ${dir === 'pl' ? 'pl' : ''}">${esc(q)}</div></div>
+   <div class="opts">${s.opts.map((o, i) => `<button class="opt ${dir === 'en' ? 'pl' : ''}" data-opt="${i}"><kbd>${i + 1}</kbd><span>${esc(ans(o))}</span></button>`).join('')}</div>
+   <div class="actions" id="qnext"></div></div>`;
+}
+function quizPick(i) {
+  const s = session; if (s.answered || !s.opts || !s.opts[i]) return;
+  s.answered = true; const x = s.qs[s.i], ok = s.opts[i] === x;
+  document.querySelectorAll('.opt').forEach((b, j) => { b.disabled = true; if (s.opts[j] === x) b.classList.add('right'); else if (j === i) b.classList.add('wrong'); });
+  if (ok) { s.score++; } else s.missed.push(x);
+  say(x.pl);
+  $('#qnext').innerHTML = `<button class="btn primary" data-next>${s.i + 1 < s.qs.length ? 'Next question' : 'See results'} →</button>`;
+  $('#qnext button').focus();
+}
+function quizNext() { const s = session; s.i++; s.opts = null; s.answered = false; quiz($('#mode')); }
+
+/* type it */
+const KEYS = ['ą','ć','ę','ł','ń','ó','ś','ź','ż'];
+function typeit(el) {
+  const s = session;
+  if (!s.items.length) { el.innerHTML = '<div class="empty">Nothing to practise with this filter.</div>'; return; }
+  if (!s.qs) s.qs = s.items.slice(0, Math.min(10, s.items.length));
+  if (s.i >= s.qs.length) return finish(el, `${s.score} of ${s.qs.length} typed correctly.`, s.missed.length ? `Retry the ${s.missed.length} you missed` : null, true);
+  const x = s.qs[s.i];
+  el.innerHTML = `<div class="stage"><div class="count"><span class="num">${s.i + 1} of ${s.qs.length}</span><span class="num">${s.score} correct</span></div>
+   <div class="prompt"><div class="label" style="margin-bottom:6px">Write in Polish</div><div class="big">${esc(x.en)}</div></div>
+   <form class="typein" id="tf"><input id="ti" autocomplete="off" autocapitalize="off" spellcheck="false" lang="pl" placeholder="Type the Polish…" aria-label="Your answer in Polish"><button class="btn primary" id="tbtn">Check</button></form>
+   <div class="keys">${KEYS.map(k => `<button type="button" data-key="${k}">${k}</button>`).join('')}</div>
+   <div id="tfb"></div></div>`;
+  const inp = $('#ti'); inp.focus();
+  $('#tf').onsubmit = e => {
+    e.preventDefault();
+    if (s.answered) return typeNext();
+    const r = check(inp.value, x.pl); if (r === 'empty') { inp.focus(); return; }
+    s.answered = true; inp.readOnly = true;
+    inp.classList.add(r === 'bad' ? 'bad' : 'ok');
+    if (r !== 'bad') s.score++; else s.missed.push(x);
+    const msg = r === 'ok' ? 'Dobrze! That’s right.' : r === 'near' ? 'Almost. Check the accents:' : 'Not quite. The answer is:';
+    $('#tfb').innerHTML = `<div class="fb ${r}">${msg}${r !== 'ok' ? `<div class="pl" style="margin-top:4px">${esc(x.pl)} ${speakBtn(x.pl)}</div>` : ''}</div>`;
+    say(x.pl);
+    $('#tbtn').textContent = s.i + 1 < s.qs.length ? 'Next →' : 'See results';
+  };
+}
+function typeNext() { const s = session; s.i++; s.answered = false; typeit($('#mode')); }
+
+function finish(el, text, retryLabel, scored) {
+  const s = session, n = scored ? s.qs.length : s.items.length, pct = scored ? Math.round(s.score / n * 100) : null;
+  touchStreak();
+  el.innerHTML = `<div class="stage"><div class="card" style="cursor:default"><div class="done">
+    ${scored ? `<div class="score num">${pct}%</div>` : '<div class="score">Gotowe!</div>'}
+    <p style="font-size:1.1rem">${text}</p>
+    ${s.missed.length ? `<p class="muted">Still learning: ${s.missed.slice(0, 6).map(m => `<span class="pl" style="color:var(--ink)">${esc(m.pl)}</span>`).join(', ')}${s.missed.length > 6 ? '…' : ''}</p>` : ''}
+    <div class="actions">${retryLabel ? `<button class="btn primary" data-retry>${retryLabel}</button>` : ''}<button class="btn" data-restart>Start a new round</button></div></div></div></div>`;
+}
+function retryMissed() {
+  const m = session.missed; session = {items: shuffle(m), i: 0, score: 0, flipped: false, answered: false, missed: []};
+  const el = $('#mode'); if (mode === 'practice') { session.qs = session.items; practice(el); return; } if (mode === 'cards') cards(el); else if (mode === 'quiz') { session.qs = session.items; quiz(el); } else { session.qs = session.items; typeit(el); }
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const t = e.target.closest('button,[data-topic]'); if (!t) return;
+  const d = t.dataset;
+  if (d.topic) { filter = 'all'; const k = TOPICS[d.topic].kind; mode = k === 'alphabet' ? 'letters' : k === 'verbs' ? 'tables' : k === 'grammar' ? 'lesson' : 'sheet'; go({name: 'topic', t: d.topic}); }
+  else if (d.mix) { mode = d.mix === 'grammar' ? 'practice' : 'cards'; go({name: 'topic', mix: d.mix}); }
+  else if (d.popt) practicePick(+d.popt);
+  else if ('pnext' in d) practiceNext();
+  else if ('goLast' in d) { mode = last.mix ? (last.mix === 'grammar' ? 'practice' : 'cards') : (TOPICS[last.t].kind === 'grammar' ? 'lesson' : 'sheet'); go(last.mix ? {name: 'topic', mix: last.mix} : {name: 'topic', t: last.t}); }
+  else if ('home' in d) go({name: 'home'});
+  else if (d.mode) { mode = d.mode; render(); }
+  else if (d.filter) { filter = d.filter; render(); }
+  else if (d.dir) { dir = d.dir; render(); }
+  else if ('restart' in d) mountMode();
+  else if (d.card) { if (d.card === 'flip') flipCard(); else cardAnswer(d.card === 'got'); }
+  else if (d.opt) quizPick(+d.opt);
+  else if ('next' in d) quizNext();
+  else if ('retry' in d) retryMissed();
+  else if (d.key) { const i = $('#ti'); if (i && !i.readOnly) { const p = i.selectionStart ?? i.value.length; i.value = i.value.slice(0, p) + d.key + i.value.slice(i.selectionEnd ?? p); i.focus(); i.setSelectionRange(p + 1, p + 1); } }
+});
+document.addEventListener('keydown', e => {
+  if (view.name === 'home' || e.target.tagName === 'INPUT' || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (mode === 'cards' && session) {
+    if (e.key === ' ' || e.key === 'Enter') { if (!session.flipped) { e.preventDefault(); flipCard(); } }
+    else if (session.flipped && (e.key === 'ArrowRight' || e.key === '2')) cardAnswer(true);
+    else if (session.flipped && (e.key === 'ArrowLeft' || e.key === '1')) cardAnswer(false);
+  } else if (mode === 'practice' && session) {
+    if (/^[1-4]$/.test(e.key)) practicePick(+e.key - 1);
+    else if (e.key === 'Enter' && session.answered) { e.preventDefault(); practiceNext(); }
+  } else if (mode === 'quiz' && session) {
+    if (/^[1-4]$/.test(e.key)) quizPick(+e.key - 1);
+    else if (e.key === 'Enter' && session.answered) { e.preventDefault(); quizNext(); }
+  }
+});
+
+
+$('#sub').textContent = `${TOTAL.toLocaleString()} words and phrases from your Talk Polish episodes, plus a grammar guide`;
+updateStats();
+render();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script>
+</body>
+</html>
